@@ -102,7 +102,7 @@ Targeted space coolkids
 
 Now that we're logged in and ready to get up and running we'll invoke the `ibmcloud dev create` command to walk us through the process of creating our Web app:
 
-![](https://asciinema.org/a/208069)
+[![asciicast](https://asciinema.org/a/208069.svg)](https://asciinema.org/a/208069)
 
 ### Updating our starter application
 
