@@ -5,18 +5,121 @@
     <description></description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 13 Nov 2018 14:35:43 -0600</pubDate>
-    <lastBuildDate>Tue, 13 Nov 2018 14:35:43 -0600</lastBuildDate>
+    <pubDate>Mon, 26 Nov 2018 15:28:12 -0600</pubDate>
+    <lastBuildDate>Mon, 26 Nov 2018 15:28:12 -0600</lastBuildDate>
     <generator>Jekyll v3.8.4</generator>
     
       <item>
-        <title>Getting started with the IBM Cloud CLI</title>
-        <description>&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;/h2&gt;
-&lt;p&gt;Today I will be showing you how to get up and running with deploying a simple web application backed by a hosted IBM Cloud service. I will be utilizing the IBM Cloud CLI and will show a few different deployment options.&lt;/p&gt;
+        <title>IBM Cloud Object storage with s3cmd or rclone</title>
+        <description>&lt;h1 id=&quot;overview&quot;&gt;Overview&lt;/h1&gt;
+
+&lt;p&gt;Today I will show you how to interact with IBM Cloud Object storage using some command line utilities. While the IBM Cloud Object storage supports IAM and API key based access, most third party utilities require you to use the &lt;code class=&quot;highlighter-rouge&quot;&gt;secret key/access key&lt;/code&gt; method of authentication so I will also be showing you how to generate &lt;code class=&quot;highlighter-rouge&quot;&gt;HMAC&lt;/code&gt; credentials for use with &lt;code class=&quot;highlighter-rouge&quot;&gt;rclone&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;s3cmd&lt;/code&gt;.&lt;/p&gt;
+
+&lt;!--description--&gt;
+
+&lt;h2 id=&quot;generating-hmac-credentials-via-the-ibm-cloud-cli&quot;&gt;Generating HMAC Credentials via the IBM Cloud CLI&lt;/h2&gt;
+
+&lt;p&gt;If you have the IBM Cloud CLI installed you can generate the needed &lt;code class=&quot;highlighter-rouge&quot;&gt;secret key/access key&lt;/code&gt; combo by using the &lt;code class=&quot;highlighter-rouge&quot;&gt;service-key-create&lt;/code&gt; command. First I will find the instance on my account. I tend to forget things if I try to be cute and clever with names so in this case I named my Cloud Object Storage instance &lt;code class=&quot;highlighter-rouge&quot;&gt;icos-rt&lt;/code&gt;. With the instance name we can now generate some service credentials. To have the new credentials include &lt;code class=&quot;highlighter-rouge&quot;&gt;secret key/access key&lt;/code&gt; authentication we have to pass the JSON parameters &lt;code class=&quot;highlighter-rouge&quot;&gt;{&quot;HMAC&quot;:true}&lt;/code&gt; to the &lt;code class=&quot;highlighter-rouge&quot;&gt;service-key-create&lt;/code&gt; command.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud resource service-key-create icos-rt-creds Administrator &lt;span class=&quot;nt&quot;&gt;--instance-name&lt;/span&gt; icos-rt &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{&quot;HMAC&quot;:true}'&lt;/span&gt;
+Creating service key of service instance icos-rt under account IBM as rtiffany@us.ibm.com...
+OK
+Service key crn:v1:bluemix:public:cloud-object-storage:global:a/xxxxxxx:xxxxxxxx:resource-key:xxxxxx was created.
+
+Name:          icos-rt-creds
+&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;output output output&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;generating-hmac-credentials-via-the-ibm-cloud-portal&quot;&gt;Generating HMAC Credentials via the IBM Cloud Portal&lt;/h2&gt;
+
+&lt;p&gt;To generate HMAC credentials via the GUI, simply go to the IBM Cloud Object storage account and click on &lt;code class=&quot;highlighter-rouge&quot;&gt;Service Credentials&lt;/code&gt;. On the subsequent page click &lt;code class=&quot;highlighter-rouge&quot;&gt;New Credential&lt;/code&gt; and under &lt;code class=&quot;highlighter-rouge&quot;&gt;Add Inline Configuration Parameters&lt;/code&gt; enter &lt;code class=&quot;highlighter-rouge&quot;&gt;{&quot;HMAC&quot;:true}&lt;/code&gt;.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;img src=&quot;https://dsc.cloud/quickshare/Screenshot_2018-11-14-11.48.04_tEP2cy.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;img src=&quot;https://dsc.cloud/quickshare/Screenshot_2018-11-15-15.19.51_qPDey0.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;s3cmd&quot;&gt;s3cmd&lt;/h3&gt;
+&lt;p&gt;The first tool I will highlight is &lt;a href=&quot;https://github.com/s3tools/s3cmd&quot; target=&quot;_blank&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;s3cmd&lt;/code&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;S3cmd (s3cmd) is a free command line tool and client for uploading, retrieving and managing data in Amazon S3 and other cloud storage service providers that use the S3 protocol, such as Google Cloud Storage or DreamHost DreamObjects. It is best suited for power users who are familiar with command line programs. It is also ideal for batch scripts and automated backup to S3, triggered from cron, etc.&lt;/p&gt;
+
+  &lt;p&gt;– from the Official s3cmd repository&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h4 id=&quot;installing-s3cmd&quot;&gt;Installing s3cmd&lt;/h4&gt;
+
+&lt;p&gt;You can grab the most up to date version of s3cmd from the &lt;a href=&quot;https://github.com/s3tools/s3cmd/releases&quot;&gt;s3cmd releases&lt;/a&gt; page. Unpack the binary and put it in &lt;code class=&quot;highlighter-rouge&quot;&gt;$PATH&lt;/code&gt;. Once the binary is in place you can run through the initial configuration by issuing the command &lt;code class=&quot;highlighter-rouge&quot;&gt;s3cmd --configure&lt;/code&gt;. You will be prompted for your Secret Key, Access Key, the COS &lt;a href=&quot;https://console.bluemix.net/docs/services/cloud-object-storage/basics/endpoints.html#select-regions-and-endpoints&quot;&gt;endpoint&lt;/a&gt; you would like to use as well as some additional options around encryption. With the configuration complete you can now test that everything is configured by listing the buckets on your account.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;s3cmd &lt;span class=&quot;nb&quot;&gt;ls
+&lt;/span&gt;2018-06-25 17:11  s3://cloudcontainerqstest
+2018-07-02 03:04  s3://homenextcloud
+2018-08-14 17:33  s3://icospublicaccesstestbucket
+2018-10-02 19:46  s3://image-template-exports-rt
+2018-10-13 01:05  s3://isoimporttemplates
+2018-09-10 18:44  s3://johnnykaratessuperawesomebucket
+2018-09-13 19:51  s3://k8s-pvc-backup-bucket
+2018-08-09 18:55  s3://k8spvcbuckettest
+2018-07-27 19:20  s3://lingering-feather-73
+2018-05-04 18:08  s3://objectivefstest
+2018-04-23 19:27  s3://publicaccesstestbucket
+2018-04-27 01:14  s3://remote-tf-statefiles
+2018-10-26 20:54  s3://rtvsibackupbucket
+2018-04-25 20:44  s3://testingasperahighspeedthing&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://s3tools.org/usage&quot;&gt;Full s3cmd documentation&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;rclone&quot;&gt;rclone&lt;/h3&gt;
+
+&lt;p&gt;The second tool I want to highlight is &lt;a href=&quot;https://rclone.org/&quot; target=&quot;_blank&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;rclone&lt;/code&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Rclone (“rsync for cloud storage”) is a command line program to sync files and directories to and from different cloud storage providers.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;To get started with rclone head over to &lt;a href=&quot;https://rclone.org/downloads/&quot;&gt;rclone downloads&lt;/a&gt; and grab the approriate package for your operating system. Once you have &lt;code class=&quot;highlighter-rouge&quot;&gt;rclone&lt;/code&gt; installed you can head over to this handy &lt;a href=&quot;https://rclone.org/s3/#ibm-cos-s3&quot;&gt;guide&lt;/a&gt; for a run through of how to configure rclone to work with IBM Cloud Object storage. Your configuration file should end up looking something like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;IBMCOS]
+&lt;span class=&quot;nb&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; s3
+provider &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; IBMCOS
+env_auth &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;false
+&lt;/span&gt;access_key_id &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; xxxxxxxxxxxx
+secret_access_key &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; xxxxxxxxxxxx
+endpoint &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; s3-api.us-geo.objectstorage.softlayer.net
+location_constraint &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; us-standard
+acl &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; public-read&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;With the tool configured you can test it out by listing the buckets on your account:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;rclone lsd IBMCOS:
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-06-25 12:11:20        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; cloudcontainerqstest
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-07-01 22:04:59        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; homenextcloud
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-08-14 12:33:31        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; icospublicaccesstestbucket
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-10-02 14:46:53        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; image-template-exports-rt
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-10-12 20:05:54        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; isoimporttemplates
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-09-10 13:44:27        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; johnnykaratessuperawesomebucket
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-09-13 14:51:31        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; k8s-pvc-backup-bucket
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-08-09 13:55:02        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; k8spvcbuckettest
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-07-27 14:20:35        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; lingering-feather-73
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-05-04 13:08:07        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; objectivefstest
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-04-23 14:27:12        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; publicaccesstestbucket
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-04-26 20:14:33        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; remote-tf-statefiles
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-10-26 15:54:46        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; rtvsibackupbucket
+          &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; 2018-04-25 15:44:55        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; testingasperahighspeedthing
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;rclone lsd IBMCOS:johnnykaratessuperawesomebucket
+     0 2018-11-14 09:37:11        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; Sync
+     0 2018-11-14 09:37:11        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; terraform_logs&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://rclone.org/docs/&quot;&gt;Full rclone documentation&lt;/a&gt;&lt;/p&gt;
+
 </description>
-        <pubDate>Tue, 13 Nov 2018 00:00:00 -0600</pubDate>
-        <link>http://localhost:4000/ibmcloud/2018/11/13/getting-started-cli.html</link>
-        <guid isPermaLink="true">http://localhost:4000/ibmcloud/2018/11/13/getting-started-cli.html</guid>
+        <pubDate>Wed, 14 Nov 2018 00:00:00 -0600</pubDate>
+        <link>http://localhost:4000/ibmcloud/2018/11/14/icos-s3cmd-rclone.html</link>
+        <guid isPermaLink="true">http://localhost:4000/ibmcloud/2018/11/14/icos-s3cmd-rclone.html</guid>
         
         
         <category>ibmcloud</category>
@@ -24,44 +127,170 @@
       </item>
     
       <item>
-        <title>Welcome to Jekyll!</title>
-        <description>&lt;p&gt;You’ll find this post in your &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
-
-&lt;p&gt;To add new posts, simply add a file in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code class=&quot;highlighter-rouge&quot;&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
-
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Tom'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints 'Hi, Tom' to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;
+        <title>Getting started with the IBM Cloud CLI</title>
+        <description>&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;/h2&gt;
+&lt;p&gt;Today I will be showing you how to get up and running with deploying a simple web application backed by a hosted IBM Cloud service. I will be utilizing the IBM Cloud CLI and will show a few different deployment options.&lt;/p&gt;
 
 &lt;!--description--&gt;
 
-&lt;p&gt;You’ll find this post in your &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
+&lt;h2 id=&quot;target-audience&quot;&gt;Target audience&lt;/h2&gt;
+&lt;p&gt;This guide is really aimed at folks that have dabbled with command line and maybe even done a bit of light programming work but are unfamiliar with deploying applications to the IBM Cloud.&lt;/p&gt;
 
-&lt;p&gt;To add new posts, simply add a file in the &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory that follows the convention &lt;code class=&quot;highlighter-rouge&quot;&gt;YYYY-MM-DD-name-of-post.ext&lt;/code&gt; and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
+&lt;h2 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;An IBM Cloud Account&lt;/li&gt;
+  &lt;li&gt;Access to Linux or macOS terminal&lt;/li&gt;
+&lt;/ul&gt;
 
-&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+&lt;h3 id=&quot;installing-cli&quot;&gt;Installing CLI&lt;/h3&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Tom'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints 'Hi, Tom' to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;You have a few options for how you would like to install the IBM Cloud CLI:&lt;/p&gt;
 
-&lt;p&gt;Check out the &lt;a href=&quot;http://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Run the one-line installer. This will also install some IBM Cloud Plugins as well as tools to interact with Kubernetes and Docker. See here for the full list of installed components. Piping to bash is controversial, as it prevents you from reading code that is about to run on your system. Therefore, we provide these alternative installation methods:&lt;/li&gt;
+  &lt;li&gt;Download and install the binary version. If you’re comfortable unziping files and understand how to move binaries in to your PATH then this is the option for you.&lt;/li&gt;
+  &lt;li&gt;Use &lt;a href=&quot;https://github.com/l2fprod/bxshell&quot;&gt;bxshell&lt;/a&gt; which is run as a local Docker container that has the CLI and tools baked in. Pretty handy for kicking the tires.&lt;/li&gt;
+&lt;/ol&gt;
 
+&lt;h3 id=&quot;installing-plugins&quot;&gt;Installing plugins&lt;/h3&gt;
+
+&lt;p&gt;If you choose option 1 in the previous step you will also need to install a few plugins to follow along with this tutorial.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;dev &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;container-service/kubernetes-service &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt; 
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;container-registry &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;With the CLI and plugins installed we can move on to logging in to the CLI and getting our environment configured.&lt;/p&gt;
+
+&lt;h3 id=&quot;cli-authentication&quot;&gt;CLI Authentication&lt;/h3&gt;
+
+&lt;p&gt;It is not considered best practice to log in to the CLI using your IBMid username and password, so we will invoke the &lt;code class=&quot;highlighter-rouge&quot;&gt;--sso&lt;/code&gt; option which will open a browser window for account log in. Once you have logged in to the account via the browser you will be redirected to a page that has a one-time passcode to use for authentication.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud login &lt;span class=&quot;nt&quot;&gt;--sso&lt;/span&gt;
+API endpoint: https://api.ng.bluemix.net
+
+Get One Time Code from https://iam-id-2.eu-gb.bluemix.net/identity/passcode to proceed.
+Open the URL &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;the default browser? &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Y/n]&amp;gt;Y&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://dsc.cloud/quickshare/GUI-Loginv2.png&quot; alt=&quot;IBM Cloud Login page&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://dsc.cloud/quickshare/onetimepass.png&quot; alt=&quot;One Time Passcode&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Once we’ve got the code we hop back to the terminal and complete the log in process.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;One Time Code &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; xxxxxx
+Authenticating...
+OK
+
+Select an account:
+1. Mouserat Account &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxxxxxxxxxxxx&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+2. IBM &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxxxxxxxxxxxx&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &amp;lt;-&amp;gt; 78003
+Enter a number&amp;gt; 2
+Targeted account IBM &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxxxxxxxxxxxx&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &amp;lt;-&amp;gt; 78003
+
+&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;output output output&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;generating-an-api-key&quot;&gt;Generating an API Key&lt;/h3&gt;
+
+&lt;p&gt;Since we’ve already touched on not wanting to use IBMid and password for authentication with the CLI, and generating a one-time passcode is not always practical (headless server for instance), we can create an API key that will be used for authentication instead.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud iam api-key-create &amp;lt;KEY-NAME&amp;gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Key Description&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;You will need to copy and paste the key somewhere safe as it will not be displayed again.&lt;/p&gt;
+
+&lt;p&gt;Set environmental variable&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;IBMCLOUD_API_KEY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'&amp;lt;key copied from previous step&amp;gt;'&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Setting Resource group, Region, and Space&lt;/p&gt;
+
+&lt;p&gt;You can target specific pieces of your IBM Cloud environment during the login process using the IBM Cloud CLI. For instance on my account I want to target the CDE TEAM Organization and under that the Resource Group CDE and the Space coolkids in the US-South region:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud login &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; api.ng.bluemix.net &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;CDE TEAM&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;CDE&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; coolkids
+
+Targeted account IBM &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxxxxxxxxxxxx&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &amp;lt;-&amp;gt; 78003
+Targeted resource group CDE
+Targeted Cloud Foundry &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;https://api.ng.bluemix.net&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Targeted org CDE TEAM
+Targeted space coolkids
+&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;output output output&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h2 id=&quot;creating-a-starter-application-using-the-ibm-cloud-cli-dev-plugin&quot;&gt;Creating a starter application using the IBM Cloud CLI Dev plugin&lt;/h2&gt;
+
+&lt;p&gt;Now that we’re logged in and ready to get up and running we’ll invoke the &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud dev create&lt;/code&gt; command to walk us through the process of creating our Web app:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://asciinema.org/a/208069&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;https://asciinema.org/a/208069.svg&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;updating-our-starter-application&quot;&gt;Updating our starter application&lt;/h3&gt;
+
+&lt;p&gt;As you can see in the video above, the &lt;code class=&quot;highlighter-rouge&quot;&gt;dev&lt;/code&gt; tool created our application code, bound an IBM Cloud service (in this case Cloudant), and downloaded the code to our local directory. With the code now on our machine we can build our application and test it locally using the build and run subcommands:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/rtgotestapp
+~/rtgotestapp &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev build
+Getting service credentials &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the application.
+OK
+Validating Docker image name
+OK
+Checking &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;Docker container rtgotestapp-go-tools is running
+OK
+Checking Docker image &lt;span class=&quot;nb&quot;&gt;history &lt;/span&gt;to see &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;image already exists
+OK
+Creating image rtgotestapp-go-tools based on Dockerfile-tools ...
+Image will have user ryan with &lt;span class=&quot;nb&quot;&gt;id &lt;/span&gt;501 added
+
+Executing docker image build &lt;span class=&quot;nt&quot;&gt;--file&lt;/span&gt; Dockerfile-tools &lt;span class=&quot;nt&quot;&gt;--tag&lt;/span&gt; rtgotestapp-go-tools &lt;span class=&quot;nt&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pull&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--build-arg&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;bx_dev_userid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;501 &lt;span class=&quot;nt&quot;&gt;--build-arg&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;bx_dev_user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ryan &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+
+OK
+Creating a container named &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-tools'&lt;/span&gt; from that image...
+OK
+Starting the &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-tools'&lt;/span&gt; container...
+OK
+OK
+Stopping the &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-tools'&lt;/span&gt; container...
+OK
+
+~/rtgotestapp &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev run
+The run-cmd option was not specified
+Stopping the &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-run'&lt;/span&gt; container...
+The &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-run'&lt;/span&gt; container was not found
+Validating Docker image name
+Binding IP and ports &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;Docker image.
+OK
+Checking &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;Docker container rtgotestapp-go-run is running
+OK
+Checking Docker image &lt;span class=&quot;nb&quot;&gt;history &lt;/span&gt;to see &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;image already exists
+OK
+Creating image rtgotestapp-go-run based on Dockerfile ...
+
+Executing docker image build &lt;span class=&quot;nt&quot;&gt;--file&lt;/span&gt; Dockerfile &lt;span class=&quot;nt&quot;&gt;--tag&lt;/span&gt; rtgotestapp-go-run &lt;span class=&quot;nt&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pull&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+
+OK
+Creating a container named &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-run'&lt;/span&gt; from that image...
+OK
+Starting the &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-run'&lt;/span&gt; container...
+OK&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;From another terminal session we can curl our local application and should see the console return logging information:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-I&lt;/span&gt; localhost:8080 
+
+Logs &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the rtgotestapp-go-run container:
+&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;level&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;info&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;msg&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Starting rtgotestapp on port :8080&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;time&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;2018-10-23T17:25:24Z&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:25 | 200 |    1.689152ms |      172.17.0.1 |  GET     /
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:31 | 200 |    1.041034ms |      172.17.0.1 |  HEAD     /
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:38 | 200 |     188.675µs |      172.17.0.1 |  HEAD     /
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:44 | 200 |     391.497µs |      172.17.0.1 |  GET     /&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;tie-in-to-logging-and-metrics&quot;&gt;Tie in to logging and metrics&lt;/h3&gt;
+
+&lt;h3 id=&quot;deployment-options-devopssource-control&quot;&gt;Deployment options (devops,source control)&lt;/h3&gt;
 </description>
-        <pubDate>Sun, 19 Jun 2016 08:06:26 -0500</pubDate>
-        <link>http://localhost:4000/jekyll/2016/06/19/welcome-to-jekyll.html</link>
-        <guid isPermaLink="true">http://localhost:4000/jekyll/2016/06/19/welcome-to-jekyll.html</guid>
+        <pubDate>Tue, 13 Nov 2018 00:00:00 -0600</pubDate>
+        <link>http://localhost:4000/ibmcloud/2018/11/13/getting-started-cli.html</link>
+        <guid isPermaLink="true">http://localhost:4000/ibmcloud/2018/11/13/getting-started-cli.html</guid>
         
         
-        <category>jekyll</category>
+        <category>ibmcloud</category>
         
       </item>
     
