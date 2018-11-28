@@ -85,9 +85,9 @@
 <p>You have a few options for how you would like to install the IBM Cloud CLI:</p>
 
 <ol>
-  <li>Run the one-line installer. This will also install some IBM Cloud Plugins as well as tools to interact with Kubernetes and Docker. See here for the full list of installed components. Piping to bash is controversial, as it prevents you from reading code that is about to run on your system. Therefore, we provide these alternative installation methods:</li>
-  <li>Download and install the binary version. If you’re comfortable unziping files and understand how to move binaries in to your PATH then this is the option for you.</li>
-  <li>Use <a href="https://github.com/l2fprod/bxshell">bxshell</a> which is run as a local Docker container that has the CLI and tools baked in. Pretty handy for kicking the tires.</li>
+  <li>Run the one-line installer. This will also install some IBM Cloud Plugins as well as tools to interact with Kubernetes and Docker. See <a href="https://console.bluemix.net/docs/cli/index.html#overview">here</a> for the full list of installed components. Piping to bash is controversial, as it prevents you from reading code that is about to run on your system. Therefore, we provide these alternative installation methods:</li>
+  <li>Download and install the <a href="https://console.bluemix.net/docs/cli/reference/ibmcloud/all_versions.html#ibm-cloud-cli-releases">binary version</a>. If you’re comfortable unziping files and understand how to move binaries in to your PATH then this is the option for you.</li>
+  <li>Use <a href="https://github.com/l2fprod/bxshell" target="_blank">bxshell</a> which is run as a local Docker container that has the CLI and tools baked in. Pretty handy for kicking the tires.</li>
 </ol>
 
 <h3 id="installing-plugins">Installing plugins</h3>
@@ -96,7 +96,8 @@
 
 <figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud plugin <span class="nb">install </span>dev <span class="nt">-r</span> <span class="s1">'IBM Cloud'</span>
 <span class="nv">$ </span>ibmcloud plugin <span class="nb">install </span>container-service/kubernetes-service <span class="nt">-r</span> <span class="s1">'IBM Cloud'</span> 
-<span class="nv">$ </span>ibmcloud plugin <span class="nb">install </span>container-registry <span class="nt">-r</span> <span class="s1">'IBM Cloud'</span></code></pre></figure>
+<span class="nv">$ </span>ibmcloud plugin <span class="nb">install </span>container-registry <span class="nt">-r</span> <span class="s1">'IBM Cloud'</span>
+<span class="nv">$ </span>ibmcloud plugin <span class="nb">install </span>logging-cli <span class="nt">-r</span> <span class="s1">'IBM Cloud'</span></code></pre></figure>
 
 <p>With the CLI and plugins installed we can move on to logging in to the CLI and getting our environment configured.</p>
 
@@ -161,7 +162,9 @@ Targeted space coolkids
 
 <h3 id="updating-our-starter-application">Updating our starter application</h3>
 
-<p>As you can see in the video above, the <code class="highlighter-rouge">dev</code> tool created our application code, bound an IBM Cloud service (in this case Cloudant), and downloaded the code to our local directory. With the code now on our machine we can build our application and test it locally using the build and run subcommands:</p>
+<p>As you can see in the video above, the <code class="highlighter-rouge">dev</code> tool created our application code, bound an IBM Cloud service (in this case Cloudant), and downloaded the code to our local directory. If you created an application via the GUI you can invoke the command <code class="highlighter-rouge">ibmcloud dev code &lt;name of app&gt;</code> to download the code in to your current directory.</p>
+
+<p>With the code now on our machine we can build our application and test it locally using the build and run subcommands:</p>
 
 <figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span><span class="nb">cd</span> ~/rtgotestapp
 ~/rtgotestapp <span class="nv">$ </span>ibmcloud dev build
@@ -219,9 +222,135 @@ Logs <span class="k">for </span>the rtgotestapp-go-run container:
 <span class="o">[</span>GIN] 2018/10/23 - 17:26:38 | 200 |     188.675µs |      172.17.0.1 |  HEAD     /
 <span class="o">[</span>GIN] 2018/10/23 - 17:26:44 | 200 |     391.497µs |      172.17.0.1 |  GET     /</code></pre></figure>
 
-<h3 id="tie-in-to-logging-and-metrics">Tie in to logging and metrics</h3>
+<h3 id="cloud-foundry-deployment">Cloud Foundry Deployment</h3>
+<p>With our simple application tested and built we can now move on to deployment. By default when you invoke <code class="highlighter-rouge">ibmcloud dev deploy</code> the application will be deployed using Cloud Foundry.</p>
 
-<h3 id="deployment-options-devopssource-control">Deployment options (devops,source control)</h3>
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud dev deploy
+
+The <span class="nb">hostname </span><span class="k">for </span>this application will be: rtgotestapp
+? Press <span class="o">[</span>Return] to accept this, or enter a new value now&gt;
+Deploying to Cloud Foundry...
+
+Executing ibmcloud cf push
+
+Invoking <span class="s1">'cf push'</span>...
+
+Pushing from manifest to org CDE TEAM / space coolkids...
+Using manifest file /Users/ryan/rtgotestapp/manifest.yml
+Using manifest file /Users/ryan/rtgotestapp/manifest.yml
+
+Creating app rtgotestapp <span class="k">in </span>org CDE TEAM / space coolkids...
+OK
+
+Creating route rtgotestapp.mybluemix.net...
+OK
+
+Binding rtgotestapp.mybluemix.net to rtgotestapp...
+OK
+
+Uploading rtgotestapp...
+Uploading app files from: /Users/ryan/rtgotestapp
+Uploading 20.6K, 35 files
+Done uploading
+OK
+
+<span class="o">(</span>yada yada yada<span class="o">)</span>
+
+0 of 1 instances running, 1 starting
+1 of 1 instances running
+
+App started
+OK
+
+App rtgotestingapp was started using this <span class="nb">command</span> <span class="sb">`</span>./bin/rtgotestapp<span class="sb">`</span>
+requested state: started
+instances: 1/1
+usage: 256M x 1 instances
+urls: rtgotestapp.mybluemix.net
+last uploaded: Tue Nov 27 15:50:50 UTC 2018
+stack: cflinuxfs2
+buildpack: https://github.com/cloudfoundry/go-buildpack.git#v1.8.25
+
+     state     since                    cpu    memory      disk      details
+<span class="c">#0   running   2018-11-27 09:52:49 AM   0.0%   0 of 256M   0 of 1G</span>
+
+OK
+Your application is hosted at http://rtgotestapp.mybluemix.net/</code></pre></figure>
+
+<h3 id="kubernetes-deployment">Kubernetes Deployment</h3>
+
+<p>To deploy your application on Kubernetes, you must either specify the deploy-target as <code class="highlighter-rouge">container</code> in the cli-config.yml or use the parameter <code class="highlighter-rouge">-t container</code> when invoking <code class="highlighter-rouge">ibmcloud dev deploy</code>. If you specify the deploy target in the cli-config.yml file you will also need to add some additional options in order to ensure you are targeting the correct cluster:</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">    deploy-image-target: <span class="s2">"registry.&lt;IBM Cloud Region&gt;.bluemix.net/&lt;Container Registry Namespace&gt;/&lt;App-Name&gt;"</span>
+
+    ibm-cluster: <span class="s2">"mycluster"</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud dev deploy <span class="nt">-t</span> container
+You are currently logged <span class="k">in</span><span class="nb">.</span> Your application will be deployed to the IBM
+Cloud.
+
+The IBM cluster name <span class="k">for </span>the deployment of this application will be:
+rtk8s
+
+? Press <span class="o">[</span>Return] to accept this, or enter a new value now&gt;
+Log <span class="k">in </span>to the IBM Container Registry
+OK
+Configuring with cluster <span class="s1">'rtk8s'</span>
+OK
+? Select a namespace <span class="k">for </span>this deployment
+1. thundercougarfalconbird
+2. rtiffany
+Enter a number&gt; 2
+
+Executing helm get values rtgotestapp
+
+Inspecting service bindings <span class="k">for </span>cluster <span class="s1">'rtk8s'</span><span class="nb">.</span>
+OK
+Tag the Run image to the Docker registry as
+registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+
+Executing docker tag rtgotestapp-go-run registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+
+Unable to tag the image rtgotestapp-go-run, will now attempt to build and tag
+it
+
+Executing docker build <span class="nt">-f</span> Dockerfile <span class="nt">-t</span> registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1 <span class="nb">.</span>
+
+<span class="o">(</span>yada yada yada<span class="o">)</span>
+
+Release <span class="s2">"rtgotestapp"</span> does not exist. Installing it now.
+NAME:   rtgotestapp
+LAST DEPLOYED: Tue Nov 27 15:33:31 2018
+NAMESPACE: default
+STATUS: DEPLOYED
+
+Executing docker rmi registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+
+OK
+Your application is hosted at http://169.62.210.230:31774/</code></pre></figure>
+
+<h3 id="logging">Logging</h3>
+
+<p>If you don’t already have an instance of the <a href="https://console.bluemix.net/docs/services/CloudLogAnalysis/log_analysis_ov.html#log_analysis_ov">IBM Cloud Log Analysis</a> service you can use the CLI to create one.</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud service create ibmLogAnalysis standard logging-rt
+Invoking <span class="s1">'cf create-service ibmLogAnalysis standard logging-rt'</span>...
+
+Creating service instance logging-rt <span class="k">in </span>org CDE TEAM / space coolkids...
+OK</code></pre></figure>
+
+<p>With the logging service instance now deployed we can now view the logs for our Cloud Foundry application using the CLI or the Kibana dashboard.</p>
+
+<figure class="highlight"><pre><code class="language-x" data-lang="x">$ ibmcloud cf logs rtgotestingapp
+Invoking 'cf logs rtgotestingapp'...
+
+Retrieving logs for app rtgotestingapp 
+
+   2018-11-28T20:57:27.04+0000 [RTR/18] OUT rtgotestapp.mybluemix.net - [2018-11-28T20:57:27.025+0000] "GET / HTTP/1.1" 200 0 42 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) Gecko/20100101 Firefox/63.0" "10.142.73.5:26126" "169.47.199.70:61398" x_forwarded_for:"76.224.107.171, 10.142.73.5" x_forwarded_proto:"http" vcap_request_id:"b95a09b2-341a-476a-5b34-f18c5a2e8d85" response_time:0.018924148 app_id:"98c95cd2-12e4-4bf1-b5a8-8ea49160ae0c" app_index:"0" x_global_transaction_id:"216301923" true_client_ip:"-" x_b3_traceid:"253df64a06a76190" x_b3_spanid:"253df64a06a76190" x_b3_parentspanid:"-"
+   2018-11-28T20:57:27.04+0000 [RTR/18] OUT</code></pre></figure>
+
+<p><img src="https://dsc.cloud/quickshare/kibana_dashboard.png" alt="" /></p>
+
 
   </div>
 

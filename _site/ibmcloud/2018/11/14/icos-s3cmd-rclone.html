@@ -125,6 +125,37 @@ Name:          icos-rt-creds
 2018-10-26 20:54  s3://rtvsibackupbucket
 2018-04-25 20:44  s3://testingasperahighspeedthing</code></pre></figure>
 
+<h3 id="copy-contents-to-a-bucket">Copy contents to a bucket</h3>
+
+<p>To sync a single object you would use the <code class="highlighter-rouge">put</code> subcommand.</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>s3cmd <span class="nt">--no-guess-mime-type</span> put Sync/gettingstartedwithsaltstack.pdf s3://imaginarycloudtestfiles
+upload: <span class="s1">'Sync/gettingstartedwithsaltstack.pdf'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/gettingstartedwithsaltstack.pdf'</span>  <span class="o">[</span>1 of 1]
+ 2053032 of 2053032   100% <span class="k">in    </span>1s  1143.14 kB/s  <span class="k">done</span></code></pre></figure>
+
+<p>If you need to recursively copy the contents of an entire directory you would use the <code class="highlighter-rouge">sync</code> subcommand.</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>s3cmd <span class="nt">--no-guess-mime-type</span> <span class="nb">sync</span> ~/tmp/dotfiles-revamp s3://imaginarycloudtestfiles                                                                                                                                                                     1 ↵
+upload: <span class="s1">'/Users/ryan/tmp/dotfiles-revamp/.git/FETCH_HEAD'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/FETCH_HEAD'</span>  <span class="o">[</span>1 of 34]
+ 103 of 103   100% <span class="k">in    </span>0s   266.98 B/s  <span class="k">done
+</span>upload: <span class="s1">'/Users/ryan/tmp/dotfiles-revamp/.git/HEAD'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/HEAD'</span>  <span class="o">[</span>2 of 34]
+ 23 of 23   100% <span class="k">in    </span>0s    65.97 B/s  <span class="k">done
+</span>upload: <span class="s1">'/Users/ryan/tmp/dotfiles-revamp/.git/config'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/config'</span>  <span class="o">[</span>3 of 34]
+ 319 of 319   100% <span class="k">in    </span>0s   835.60 B/s  <span class="k">done
+</span>upload: <span class="s1">'/Users/ryan/tmp/dotfiles-revamp/.git/description'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/description'</span>  <span class="o">[</span>4 of 34]
+ 73 of 73   100% <span class="k">in    </span>0s   214.01 B/s  <span class="k">done
+</span>upload: <span class="s1">'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/applypatch-msg.sample'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/applypatch-msg.sample'</span>  <span class="o">[</span>5 of 34]
+ 478 of 478   100% <span class="k">in    </span>0s   718.22 B/s  <span class="k">done
+</span>upload: <span class="s1">'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/commit-msg.sample'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/commit-msg.sample'</span>  <span class="o">[</span>6 of 34]
+ 896 of 896   100% <span class="k">in    </span>0s     3.39 kB/s  <span class="k">done
+</span>upload: <span class="s1">'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/fsmonitor-watchman.sample'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/fsmonitor-watchman.sample'</span>  <span class="o">[</span>7 of 34]
+ 3327 of 3327   100% <span class="k">in    </span>0s     7.36 kB/s  <span class="k">done
+</span>upload: <span class="s1">'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/post-update.sample'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/post-update.sample'</span>  <span class="o">[</span>8 of 34]
+ 189 of 189   100% <span class="k">in    </span>0s   368.38 B/s  <span class="k">done
+</span>upload: <span class="s1">'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/pre-applypatch.sample'</span> -&gt; <span class="s1">'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/pre-applypatch.sample'</span>  <span class="o">[</span>9 of 34]
+ 424 of 424   100% <span class="k">in    </span>0s   977.38 B/s  <span class="k">done</span>
+ <span class="o">(</span>yada yada yada<span class="o">)</span></code></pre></figure>
+
 <p><a href="https://s3tools.org/usage">Full s3cmd documentation</a></p>
 
 <h3 id="rclone">rclone</h3>
@@ -168,6 +199,53 @@ acl <span class="o">=</span> public-read</code></pre></figure>
 <span class="nv">$ </span>rclone lsd IBMCOS:johnnykaratessuperawesomebucket
      0 2018-11-14 09:37:11        <span class="nt">-1</span> Sync
      0 2018-11-14 09:37:11        <span class="nt">-1</span> terraform_logs</code></pre></figure>
+
+<h3 id="copy-contents-to-a-bucket-1">Copy contents to a bucket</h3>
+<p>The <code class="highlighter-rouge">rclone</code> utility works a lot like <code class="highlighter-rouge">rsync</code>. You can use it to copy files from source to destination, skipping already copied files. If you are familiar with rsync, rclone always works as if you had written a trailing / - meaning “copy the contents of this directory”. This applies to all commands and whether you are talking about the source or destination.</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell">rclone copy <span class="nb">source</span>:sourcepath dest:destpath</code></pre></figure>
+
+<p>If dest:path doesn’t exist, it is created and the source:path contents go there.</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span> dotfiles-revamp
+total 8
+<span class="nt">-rw-r--r--</span>  1 ryan  staff   85 Apr 23  2018 README.md
+<span class="nt">-rw-r--r--</span>  1 ryan  staff    0 Apr 23  2018 antigenrc
+drwxr-xr-x  9 ryan  staff  288 Apr 23  2018 basefiles
+<span class="nt">-rw-r--r--</span>  1 ryan  staff    0 Apr 23  2018 vimrc
+<span class="nt">-rw-r--r--</span>  1 ryan  staff    0 Apr 23  2018 zshrc
+
+<span class="nv">$ </span>rclone <span class="nb">ls </span>IBMCOS-PERSONAL:imaginarycloudtestfiles 
+<span class="err">$</span>
+
+<span class="nv">$ </span>rclone copy dotfiles-revamp/ IBMCOS-PERSONAL:imaginarycloudtestfiles <span class="nt">-P</span>
+Transferred:   	   23.570k / 23.570 kBytes, 100%, 4.271 kBytes/s, ETA 0s
+Errors:                 0
+Checks:                 0 / 0, -
+Transferred:           33 / 36, 92%
+Elapsed <span class="nb">time</span>:        5.5s
+Transferring:
+ <span class="k">*</span>                   .git/logs/refs/heads/master: 100% /205, 0/s, -
+ <span class="k">*</span>            .git/logs/refs/remotes/origin/HEAD: 100% /205, 0/s, -
+ <span class="k">*</span>   ...b018df6172cea3a80f80aefee5722fde6b2.pack: 100% /808, 0/s, -
+
+<span class="nv">$ </span>rclone <span class="nb">ls </span>IBMCOS-PERSONAL:imaginarycloudtestfiles
+       85 README.md
+        0 antigenrc
+        0 vimrc
+        0 zshrc
+        0 basefiles/aliases.zsh
+      591 basefiles/base.zsh
+        0 basefiles/completion.zsh
+        0 basefiles/correction.zsh
+        0 basefiles/history.zsh
+        0 basefiles/keys.zsh
+        0 basefiles/stack.zsh
+      103 .git/FETCH_HEAD
+       23 .git/HEAD
+      319 .git/config
+       73 .git/description
+     1004 .git/index</code></pre></figure>
 
 <p><a href="https://rclone.org/docs/">Full rclone documentation</a></p>
 

@@ -5,8 +5,8 @@
     <description></description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 26 Nov 2018 15:28:12 -0600</pubDate>
-    <lastBuildDate>Mon, 26 Nov 2018 15:28:12 -0600</lastBuildDate>
+    <pubDate>Wed, 28 Nov 2018 15:13:16 -0600</pubDate>
+    <lastBuildDate>Wed, 28 Nov 2018 15:13:16 -0600</lastBuildDate>
     <generator>Jekyll v3.8.4</generator>
     
       <item>
@@ -70,6 +70,37 @@ Name:          icos-rt-creds
 2018-10-26 20:54  s3://rtvsibackupbucket
 2018-04-25 20:44  s3://testingasperahighspeedthing&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
+&lt;h3 id=&quot;copy-contents-to-a-bucket&quot;&gt;Copy contents to a bucket&lt;/h3&gt;
+
+&lt;p&gt;To sync a single object you would use the &lt;code class=&quot;highlighter-rouge&quot;&gt;put&lt;/code&gt; subcommand.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;s3cmd &lt;span class=&quot;nt&quot;&gt;--no-guess-mime-type&lt;/span&gt; put Sync/gettingstartedwithsaltstack.pdf s3://imaginarycloudtestfiles
+upload: &lt;span class=&quot;s1&quot;&gt;'Sync/gettingstartedwithsaltstack.pdf'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/gettingstartedwithsaltstack.pdf'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;1 of 1]
+ 2053032 of 2053032   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;1s  1143.14 kB/s  &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If you need to recursively copy the contents of an entire directory you would use the &lt;code class=&quot;highlighter-rouge&quot;&gt;sync&lt;/code&gt; subcommand.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;s3cmd &lt;span class=&quot;nt&quot;&gt;--no-guess-mime-type&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sync&lt;/span&gt; ~/tmp/dotfiles-revamp s3://imaginarycloudtestfiles                                                                                                                                                                     1 ↵
+upload: &lt;span class=&quot;s1&quot;&gt;'/Users/ryan/tmp/dotfiles-revamp/.git/FETCH_HEAD'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/FETCH_HEAD'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;1 of 34]
+ 103 of 103   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;0s   266.98 B/s  &lt;span class=&quot;k&quot;&gt;done
+&lt;/span&gt;upload: &lt;span class=&quot;s1&quot;&gt;'/Users/ryan/tmp/dotfiles-revamp/.git/HEAD'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/HEAD'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;2 of 34]
+ 23 of 23   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;0s    65.97 B/s  &lt;span class=&quot;k&quot;&gt;done
+&lt;/span&gt;upload: &lt;span class=&quot;s1&quot;&gt;'/Users/ryan/tmp/dotfiles-revamp/.git/config'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/config'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;3 of 34]
+ 319 of 319   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;0s   835.60 B/s  &lt;span class=&quot;k&quot;&gt;done
+&lt;/span&gt;upload: &lt;span class=&quot;s1&quot;&gt;'/Users/ryan/tmp/dotfiles-revamp/.git/description'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/description'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;4 of 34]
+ 73 of 73   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;0s   214.01 B/s  &lt;span class=&quot;k&quot;&gt;done
+&lt;/span&gt;upload: &lt;span class=&quot;s1&quot;&gt;'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/applypatch-msg.sample'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/applypatch-msg.sample'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;5 of 34]
+ 478 of 478   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;0s   718.22 B/s  &lt;span class=&quot;k&quot;&gt;done
+&lt;/span&gt;upload: &lt;span class=&quot;s1&quot;&gt;'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/commit-msg.sample'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/commit-msg.sample'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;6 of 34]
+ 896 of 896   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;0s     3.39 kB/s  &lt;span class=&quot;k&quot;&gt;done
+&lt;/span&gt;upload: &lt;span class=&quot;s1&quot;&gt;'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/fsmonitor-watchman.sample'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/fsmonitor-watchman.sample'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;7 of 34]
+ 3327 of 3327   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;0s     7.36 kB/s  &lt;span class=&quot;k&quot;&gt;done
+&lt;/span&gt;upload: &lt;span class=&quot;s1&quot;&gt;'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/post-update.sample'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/post-update.sample'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;8 of 34]
+ 189 of 189   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;0s   368.38 B/s  &lt;span class=&quot;k&quot;&gt;done
+&lt;/span&gt;upload: &lt;span class=&quot;s1&quot;&gt;'/Users/ryan/tmp/dotfiles-revamp/.git/hooks/pre-applypatch.sample'&lt;/span&gt; -&amp;gt; &lt;span class=&quot;s1&quot;&gt;'s3://imaginarycloudtestfiles/dotfiles-revamp/.git/hooks/pre-applypatch.sample'&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;9 of 34]
+ 424 of 424   100% &lt;span class=&quot;k&quot;&gt;in    &lt;/span&gt;0s   977.38 B/s  &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;
+ &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;yada yada yada&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
 &lt;p&gt;&lt;a href=&quot;https://s3tools.org/usage&quot;&gt;Full s3cmd documentation&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;rclone&quot;&gt;rclone&lt;/h3&gt;
@@ -114,6 +145,53 @@ acl &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; public-read&lt;/code&gt;&lt;/
      0 2018-11-14 09:37:11        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; Sync
      0 2018-11-14 09:37:11        &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; terraform_logs&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
+&lt;h3 id=&quot;copy-contents-to-a-bucket-1&quot;&gt;Copy contents to a bucket&lt;/h3&gt;
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;rclone&lt;/code&gt; utility works a lot like &lt;code class=&quot;highlighter-rouge&quot;&gt;rsync&lt;/code&gt;. You can use it to copy files from source to destination, skipping already copied files. If you are familiar with rsync, rclone always works as if you had written a trailing / - meaning “copy the contents of this directory”. This applies to all commands and whether you are talking about the source or destination.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;rclone copy &lt;span class=&quot;nb&quot;&gt;source&lt;/span&gt;:sourcepath dest:destpath&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If dest:path doesn’t exist, it is created and the source:path contents go there.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; dotfiles-revamp
+total 8
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt;  1 ryan  staff   85 Apr 23  2018 README.md
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt;  1 ryan  staff    0 Apr 23  2018 antigenrc
+drwxr-xr-x  9 ryan  staff  288 Apr 23  2018 basefiles
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt;  1 ryan  staff    0 Apr 23  2018 vimrc
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt;  1 ryan  staff    0 Apr 23  2018 zshrc
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;rclone &lt;span class=&quot;nb&quot;&gt;ls &lt;/span&gt;IBMCOS-PERSONAL:imaginarycloudtestfiles 
+&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;rclone copy dotfiles-revamp/ IBMCOS-PERSONAL:imaginarycloudtestfiles &lt;span class=&quot;nt&quot;&gt;-P&lt;/span&gt;
+Transferred:   	   23.570k / 23.570 kBytes, 100%, 4.271 kBytes/s, ETA 0s
+Errors:                 0
+Checks:                 0 / 0, -
+Transferred:           33 / 36, 92%
+Elapsed &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;:        5.5s
+Transferring:
+ &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;                   .git/logs/refs/heads/master: 100% /205, 0/s, -
+ &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;            .git/logs/refs/remotes/origin/HEAD: 100% /205, 0/s, -
+ &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;   ...b018df6172cea3a80f80aefee5722fde6b2.pack: 100% /808, 0/s, -
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;rclone &lt;span class=&quot;nb&quot;&gt;ls &lt;/span&gt;IBMCOS-PERSONAL:imaginarycloudtestfiles
+       85 README.md
+        0 antigenrc
+        0 vimrc
+        0 zshrc
+        0 basefiles/aliases.zsh
+      591 basefiles/base.zsh
+        0 basefiles/completion.zsh
+        0 basefiles/correction.zsh
+        0 basefiles/history.zsh
+        0 basefiles/keys.zsh
+        0 basefiles/stack.zsh
+      103 .git/FETCH_HEAD
+       23 .git/HEAD
+      319 .git/config
+       73 .git/description
+     1004 .git/index&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
 &lt;p&gt;&lt;a href=&quot;https://rclone.org/docs/&quot;&gt;Full rclone documentation&lt;/a&gt;&lt;/p&gt;
 
 </description>
@@ -147,9 +225,9 @@ acl &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; public-read&lt;/code&gt;&lt;/
 &lt;p&gt;You have a few options for how you would like to install the IBM Cloud CLI:&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;Run the one-line installer. This will also install some IBM Cloud Plugins as well as tools to interact with Kubernetes and Docker. See here for the full list of installed components. Piping to bash is controversial, as it prevents you from reading code that is about to run on your system. Therefore, we provide these alternative installation methods:&lt;/li&gt;
-  &lt;li&gt;Download and install the binary version. If you’re comfortable unziping files and understand how to move binaries in to your PATH then this is the option for you.&lt;/li&gt;
-  &lt;li&gt;Use &lt;a href=&quot;https://github.com/l2fprod/bxshell&quot;&gt;bxshell&lt;/a&gt; which is run as a local Docker container that has the CLI and tools baked in. Pretty handy for kicking the tires.&lt;/li&gt;
+  &lt;li&gt;Run the one-line installer. This will also install some IBM Cloud Plugins as well as tools to interact with Kubernetes and Docker. See &lt;a href=&quot;https://console.bluemix.net/docs/cli/index.html#overview&quot;&gt;here&lt;/a&gt; for the full list of installed components. Piping to bash is controversial, as it prevents you from reading code that is about to run on your system. Therefore, we provide these alternative installation methods:&lt;/li&gt;
+  &lt;li&gt;Download and install the &lt;a href=&quot;https://console.bluemix.net/docs/cli/reference/ibmcloud/all_versions.html#ibm-cloud-cli-releases&quot;&gt;binary version&lt;/a&gt;. If you’re comfortable unziping files and understand how to move binaries in to your PATH then this is the option for you.&lt;/li&gt;
+  &lt;li&gt;Use &lt;a href=&quot;https://github.com/l2fprod/bxshell&quot; target=&quot;_blank&quot;&gt;bxshell&lt;/a&gt; which is run as a local Docker container that has the CLI and tools baked in. Pretty handy for kicking the tires.&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h3 id=&quot;installing-plugins&quot;&gt;Installing plugins&lt;/h3&gt;
@@ -158,7 +236,8 @@ acl &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; public-read&lt;/code&gt;&lt;/
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;dev &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;container-service/kubernetes-service &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt; 
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;container-registry &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;container-registry &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;logging-cli &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;With the CLI and plugins installed we can move on to logging in to the CLI and getting our environment configured.&lt;/p&gt;
 
@@ -223,7 +302,9 @@ Targeted space coolkids
 
 &lt;h3 id=&quot;updating-our-starter-application&quot;&gt;Updating our starter application&lt;/h3&gt;
 
-&lt;p&gt;As you can see in the video above, the &lt;code class=&quot;highlighter-rouge&quot;&gt;dev&lt;/code&gt; tool created our application code, bound an IBM Cloud service (in this case Cloudant), and downloaded the code to our local directory. With the code now on our machine we can build our application and test it locally using the build and run subcommands:&lt;/p&gt;
+&lt;p&gt;As you can see in the video above, the &lt;code class=&quot;highlighter-rouge&quot;&gt;dev&lt;/code&gt; tool created our application code, bound an IBM Cloud service (in this case Cloudant), and downloaded the code to our local directory. If you created an application via the GUI you can invoke the command &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud dev code &amp;lt;name of app&amp;gt;&lt;/code&gt; to download the code in to your current directory.&lt;/p&gt;
+
+&lt;p&gt;With the code now on our machine we can build our application and test it locally using the build and run subcommands:&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/rtgotestapp
 ~/rtgotestapp &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev build
@@ -281,9 +362,135 @@ Logs &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the rtgotestapp-go-run con
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:38 | 200 |     188.675µs |      172.17.0.1 |  HEAD     /
 &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:44 | 200 |     391.497µs |      172.17.0.1 |  GET     /&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;h3 id=&quot;tie-in-to-logging-and-metrics&quot;&gt;Tie in to logging and metrics&lt;/h3&gt;
+&lt;h3 id=&quot;cloud-foundry-deployment&quot;&gt;Cloud Foundry Deployment&lt;/h3&gt;
+&lt;p&gt;With our simple application tested and built we can now move on to deployment. By default when you invoke &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud dev deploy&lt;/code&gt; the application will be deployed using Cloud Foundry.&lt;/p&gt;
 
-&lt;h3 id=&quot;deployment-options-devopssource-control&quot;&gt;Deployment options (devops,source control)&lt;/h3&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev deploy
+
+The &lt;span class=&quot;nb&quot;&gt;hostname &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;this application will be: rtgotestapp
+? Press &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Return] to accept this, or enter a new value now&amp;gt;
+Deploying to Cloud Foundry...
+
+Executing ibmcloud cf push
+
+Invoking &lt;span class=&quot;s1&quot;&gt;'cf push'&lt;/span&gt;...
+
+Pushing from manifest to org CDE TEAM / space coolkids...
+Using manifest file /Users/ryan/rtgotestapp/manifest.yml
+Using manifest file /Users/ryan/rtgotestapp/manifest.yml
+
+Creating app rtgotestapp &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;org CDE TEAM / space coolkids...
+OK
+
+Creating route rtgotestapp.mybluemix.net...
+OK
+
+Binding rtgotestapp.mybluemix.net to rtgotestapp...
+OK
+
+Uploading rtgotestapp...
+Uploading app files from: /Users/ryan/rtgotestapp
+Uploading 20.6K, 35 files
+Done uploading
+OK
+
+&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;yada yada yada&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+
+0 of 1 instances running, 1 starting
+1 of 1 instances running
+
+App started
+OK
+
+App rtgotestingapp was started using this &lt;span class=&quot;nb&quot;&gt;command&lt;/span&gt; &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;./bin/rtgotestapp&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
+requested state: started
+instances: 1/1
+usage: 256M x 1 instances
+urls: rtgotestapp.mybluemix.net
+last uploaded: Tue Nov 27 15:50:50 UTC 2018
+stack: cflinuxfs2
+buildpack: https://github.com/cloudfoundry/go-buildpack.git#v1.8.25
+
+     state     since                    cpu    memory      disk      details
+&lt;span class=&quot;c&quot;&gt;#0   running   2018-11-27 09:52:49 AM   0.0%   0 of 256M   0 of 1G&lt;/span&gt;
+
+OK
+Your application is hosted at http://rtgotestapp.mybluemix.net/&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;kubernetes-deployment&quot;&gt;Kubernetes Deployment&lt;/h3&gt;
+
+&lt;p&gt;To deploy your application on Kubernetes, you must either specify the deploy-target as &lt;code class=&quot;highlighter-rouge&quot;&gt;container&lt;/code&gt; in the cli-config.yml or use the parameter &lt;code class=&quot;highlighter-rouge&quot;&gt;-t container&lt;/code&gt; when invoking &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud dev deploy&lt;/code&gt;. If you specify the deploy target in the cli-config.yml file you will also need to add some additional options in order to ensure you are targeting the correct cluster:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;    deploy-image-target: &lt;span class=&quot;s2&quot;&gt;&quot;registry.&amp;lt;IBM Cloud Region&amp;gt;.bluemix.net/&amp;lt;Container Registry Namespace&amp;gt;/&amp;lt;App-Name&amp;gt;&quot;&lt;/span&gt;
+
+    ibm-cluster: &lt;span class=&quot;s2&quot;&gt;&quot;mycluster&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev deploy &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; container
+You are currently logged &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; Your application will be deployed to the IBM
+Cloud.
+
+The IBM cluster name &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the deployment of this application will be:
+rtk8s
+
+? Press &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Return] to accept this, or enter a new value now&amp;gt;
+Log &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;to the IBM Container Registry
+OK
+Configuring with cluster &lt;span class=&quot;s1&quot;&gt;'rtk8s'&lt;/span&gt;
+OK
+? Select a namespace &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;this deployment
+1. thundercougarfalconbird
+2. rtiffany
+Enter a number&amp;gt; 2
+
+Executing helm get values rtgotestapp
+
+Inspecting service bindings &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;cluster &lt;span class=&quot;s1&quot;&gt;'rtk8s'&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+OK
+Tag the Run image to the Docker registry as
+registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+
+Executing docker tag rtgotestapp-go-run registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+
+Unable to tag the image rtgotestapp-go-run, will now attempt to build and tag
+it
+
+Executing docker build &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; Dockerfile &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1 &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+
+&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;yada yada yada&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+
+Release &lt;span class=&quot;s2&quot;&gt;&quot;rtgotestapp&quot;&lt;/span&gt; does not exist. Installing it now.
+NAME:   rtgotestapp
+LAST DEPLOYED: Tue Nov 27 15:33:31 2018
+NAMESPACE: default
+STATUS: DEPLOYED
+
+Executing docker rmi registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+
+OK
+Your application is hosted at http://169.62.210.230:31774/&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;logging&quot;&gt;Logging&lt;/h3&gt;
+
+&lt;p&gt;If you don’t already have an instance of the &lt;a href=&quot;https://console.bluemix.net/docs/services/CloudLogAnalysis/log_analysis_ov.html#log_analysis_ov&quot;&gt;IBM Cloud Log Analysis&lt;/a&gt; service you can use the CLI to create one.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud service create ibmLogAnalysis standard logging-rt
+Invoking &lt;span class=&quot;s1&quot;&gt;'cf create-service ibmLogAnalysis standard logging-rt'&lt;/span&gt;...
+
+Creating service instance logging-rt &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;org CDE TEAM / space coolkids...
+OK&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;With the logging service instance now deployed we can now view the logs for our Cloud Foundry application using the CLI or the Kibana dashboard.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-x&quot; data-lang=&quot;x&quot;&gt;$ ibmcloud cf logs rtgotestingapp
+Invoking 'cf logs rtgotestingapp'...
+
+Retrieving logs for app rtgotestingapp 
+
+   2018-11-28T20:57:27.04+0000 [RTR/18] OUT rtgotestapp.mybluemix.net - [2018-11-28T20:57:27.025+0000] &quot;GET / HTTP/1.1&quot; 200 0 42 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) Gecko/20100101 Firefox/63.0&quot; &quot;10.142.73.5:26126&quot; &quot;169.47.199.70:61398&quot; x_forwarded_for:&quot;76.224.107.171, 10.142.73.5&quot; x_forwarded_proto:&quot;http&quot; vcap_request_id:&quot;b95a09b2-341a-476a-5b34-f18c5a2e8d85&quot; response_time:0.018924148 app_id:&quot;98c95cd2-12e4-4bf1-b5a8-8ea49160ae0c&quot; app_index:&quot;0&quot; x_global_transaction_id:&quot;216301923&quot; true_client_ip:&quot;-&quot; x_b3_traceid:&quot;253df64a06a76190&quot; x_b3_spanid:&quot;253df64a06a76190&quot; x_b3_parentspanid:&quot;-&quot;
+   2018-11-28T20:57:27.04+0000 [RTR/18] OUT&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://dsc.cloud/quickshare/kibana_dashboard.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
 </description>
         <pubDate>Tue, 13 Nov 2018 00:00:00 -0600</pubDate>
         <link>http://localhost:4000/ibmcloud/2018/11/13/getting-started-cli.html</link>
