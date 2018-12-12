@@ -39,7 +39,6 @@ $ ibmcloud plugin install logging-cli -r 'IBM Cloud'
 With the CLI and plugins installed we can move on to logging in to the CLI and getting our environment configured.
 
 ### CLI Authentication
-
 It is not considered best practice to log in to the CLI using your IBMid username and password, so we will invoke the `--sso` option which will open a browser window for account log in. Once you have logged in to the account via the browser you will be redirected to a page that has a one-time passcode to use for authentication.
 
 {% highlight shell %}
@@ -88,13 +87,13 @@ $ ibmcloud iam api-key-create <KEY-NAME> -d "Key Description"
 
 You will need to copy and paste the key somewhere safe as it will not be displayed again.
 
-Set environmental variable
+#### Set environmental variable
 
 {% highlight shell %}
 export IBMCLOUD_API_KEY='<key copied from previous step>'
 {% endhighlight %}
 
-Setting Resource group, Region, and Space
+#### Setting Resource group, Region, and Space
 
 You can target specific pieces of your IBM Cloud environment during the login process using the IBM Cloud CLI. For instance on my account I want to target the `Tinylab` Organization and under that the Resource Group `default` and the Space `dev` in the US-South region:
 
