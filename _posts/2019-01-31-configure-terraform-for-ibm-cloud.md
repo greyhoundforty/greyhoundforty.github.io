@@ -4,6 +4,11 @@ title: Configure Terraform for the IBM Cloud
 date: 2019-01-31 15:31 -0600
 ---
 
+## Overview
+Today I will be showing you how to configure Terraform for use with the IBM Cloud. 
+
+<!--description-->
+
 ## Prerequisites
 - [Terraform installed](https://www.terraform.io/intro/getting-started/install.html)
 - [IBM Cloud Provider Binary installed](https://github.com/IBM-Cloud/terraform-provider-ibm/releases)
