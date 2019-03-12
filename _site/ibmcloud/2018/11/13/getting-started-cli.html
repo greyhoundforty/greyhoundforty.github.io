@@ -78,6 +78,7 @@
 <ul>
   <li>An IBM Cloud Account</li>
   <li>Access to Linux or macOS terminal</li>
+  <li>Docker installed. You can find the appropriate instructions for your Operating System <a href="https://docs.docker.com/install/">here</a>.</li>
 </ul>
 
 <h3 id="installing-cli">Installing CLI</h3>
@@ -85,14 +86,14 @@
 <p>You have a few options for how you would like to install the IBM Cloud CLI:</p>
 
 <ol>
-  <li>Run the one-line installer. This will also install some IBM Cloud Plugins as well as tools to interact with Kubernetes and Docker. See <a href="https://console.bluemix.net/docs/cli/index.html#overview">here</a> for the full list of installed components. Piping to bash is controversial, as it prevents you from reading code that is about to run on your system. Therefore, we provide these alternative installation methods:</li>
-  <li>Download and install the <a href="https://console.bluemix.net/docs/cli/reference/ibmcloud/all_versions.html#ibm-cloud-cli-releases">binary version</a>. If you’re comfortable unziping files and understand how to move binaries in to your PATH then this is the option for you.</li>
+  <li>Run the one-line installer. This will also install some IBM Cloud Plugins as well as tools to interact with Kubernetes and Docker. See <a href="https://cloud.ibm.com/docs/cli/index.html#overview" target="_blank">here</a> for the full list of installed components. Piping to bash is controversial, as it prevents you from reading code that is about to run on your system. Therefore, we provide these alternative installation methods:</li>
+  <li>Download and install the <a href="https://cloud.ibm.com/docs/cli/reference/ibmcloud/all_versions.html#ibm-cloud-cli-releases" target="_blank">binary version</a>. If you’re comfortable unziping files and understand how to move binaries in to your PATH then this is the option for you.</li>
   <li>Use <a href="https://github.com/l2fprod/bxshell" target="_blank">bxshell</a> which is run as a local Docker container that has the CLI and tools baked in. Pretty handy for kicking the tires.</li>
 </ol>
 
 <h3 id="installing-plugins">Installing plugins</h3>
 
-<p>If you choose option 1 in the previous step you will also need to install a few plugins to follow along with this tutorial.</p>
+<p>To install the plugins needed for this tutorial we will use the <code class="highlighter-rouge">ibmcloud plugin</code> subcommand. You can see all the plugins available by running the command <code class="highlighter-rouge">ibmcloud plugin repo-plugins -r 'IBM Cloud'</code>.  If you choose option 1 in the previous step you should have most of the plugins needed to follow along with this tutorial but it won’t hurt to run these commands to ensure they are installed and up to date.</p>
 
 <figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud plugin <span class="nb">install </span>dev <span class="nt">-r</span> <span class="s1">'IBM Cloud'</span>
 <span class="nv">$ </span>ibmcloud plugin <span class="nb">install </span>container-service/kubernetes-service <span class="nt">-r</span> <span class="s1">'IBM Cloud'</span> 
@@ -102,7 +103,6 @@
 <p>With the CLI and plugins installed we can move on to logging in to the CLI and getting our environment configured.</p>
 
 <h3 id="cli-authentication">CLI Authentication</h3>
-
 <p>It is not considered best practice to log in to the CLI using your IBMid username and password, so we will invoke the <code class="highlighter-rouge">--sso</code> option which will open a browser window for account log in. Once you have logged in to the account via the browser you will be redirected to a page that has a one-time passcode to use for authentication.</p>
 
 <figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud login <span class="nt">--sso</span>
@@ -121,11 +121,19 @@ Open the URL <span class="k">in </span>the default browser? <span class="o">[</s
 Authenticating...
 OK
 
-Select an account:
-1. Mouserat Account <span class="o">(</span>xxxxxxxxxxxxxxxxxxxxxxx<span class="o">)</span>
-2. IBM <span class="o">(</span>xxxxxxxxxxxxxxxxxxxxxxx<span class="o">)</span> &lt;-&gt; 78003
-Enter a number&gt; 2
-Targeted account IBM <span class="o">(</span>xxxxxxxxxxxxxxxxxxxxxxx<span class="o">)</span> &lt;-&gt; 78003
+Targeted account Ryan Tiffany<span class="s1">'s Account (xxxxxxxxxxxxxxx) &lt;-&gt; xxxxxxx
+
+Targeted resource group default
+
+
+API endpoint:      https://api.ng.bluemix.net
+Region:            us-south
+User:              ryan@example.com
+Account:           Ryan Tiffany'</span>s Account <span class="o">(</span>xxxxxxxxxxxxxxx<span class="o">)</span> &lt;-&gt; xxxxxxx
+Resource group:    default
+CF API endpoint:
+Org:
+Space:
 
 <span class="o">(</span>output output output<span class="o">)</span></code></pre></figure>
 
@@ -137,217 +145,258 @@ Targeted account IBM <span class="o">(</span>xxxxxxxxxxxxxxxxxxxxxxx<span class=
 
 <p>You will need to copy and paste the key somewhere safe as it will not be displayed again.</p>
 
-<p>Set environmental variable</p>
+<h4 id="set-environmental-variable">Set environmental variable</h4>
 
 <figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nb">export </span><span class="nv">IBMCLOUD_API_KEY</span><span class="o">=</span><span class="s1">'&lt;key copied from previous step&gt;'</span></code></pre></figure>
 
-<p>Setting Resource group, Region, and Space</p>
+<h4 id="setting-resource-group-region-and-space">Setting Resource group, Region, and Space</h4>
 
-<p>You can target specific pieces of your IBM Cloud environment during the login process using the IBM Cloud CLI. For instance on my account I want to target the CDE TEAM Organization and under that the Resource Group CDE and the Space coolkids in the US-South region:</p>
+<p>You can target specific pieces of your IBM Cloud environment during the login process using the IBM Cloud CLI. For instance on my account I want to target the <code class="highlighter-rouge">Tinylab</code> Organization and under that the Resource Group <code class="highlighter-rouge">default</code> and the Space <code class="highlighter-rouge">dev</code> in the US-South region:</p>
 
-<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud login <span class="nt">-a</span> api.ng.bluemix.net <span class="nt">-o</span> <span class="s2">"CDE TEAM"</span> <span class="nt">-g</span> <span class="s2">"CDE"</span> <span class="nt">-s</span> coolkids
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud target <span class="nt">--cf</span> <span class="nt">-o</span> TheTinylab <span class="nt">-s</span> dev
 
-Targeted account IBM <span class="o">(</span>xxxxxxxxxxxxxxxxxxxxxxx<span class="o">)</span> &lt;-&gt; 78003
-Targeted resource group CDE
 Targeted Cloud Foundry <span class="o">(</span>https://api.ng.bluemix.net<span class="o">)</span>
-Targeted org CDE TEAM
-Targeted space coolkids
+Targeted org TheTinylab
+Targeted space Dev
 <span class="o">(</span>output output output<span class="o">)</span></code></pre></figure>
 
 <h2 id="creating-a-starter-application-using-the-ibm-cloud-cli-dev-plugin">Creating a starter application using the IBM Cloud CLI Dev plugin</h2>
+<p>Now that we’re logged in and ready to get up and running we’ll invoke the <code class="highlighter-rouge">ibmcloud dev create</code> command to walk us through the process of creating our Web app. In this guide we won’t be setting up a DevOps toolchain deployment so select <code class="highlighter-rouge">3</code> when prompted about deployment options.</p>
 
-<p>Now that we’re logged in and ready to get up and running we’ll invoke the <code class="highlighter-rouge">ibmcloud dev create</code> command to walk us through the process of creating our Web app:</p>
+<p><a href="https://asciinema.org/a/216612" target="_blank"><img src="https://asciinema.org/a/216612.svg" /></a></p>
 
-<p><a href="https://asciinema.org/a/208069" target="_blank"><img src="https://asciinema.org/a/208069.svg" /></a></p>
-
-<h3 id="updating-our-starter-application">Updating our starter application</h3>
-
+<h3 id="building-and-testing-our-starter-application">Building and testing our starter application</h3>
 <p>As you can see in the video above, the <code class="highlighter-rouge">dev</code> tool created our application code, bound an IBM Cloud service (in this case Cloudant), and downloaded the code to our local directory. If you created an application via the GUI you can invoke the command <code class="highlighter-rouge">ibmcloud dev code &lt;name of app&gt;</code> to download the code in to your current directory.</p>
 
 <p>With the code now on our machine we can build our application and test it locally using the build and run subcommands:</p>
 
-<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span><span class="nb">cd</span> ~/rtgotestapp
-~/rtgotestapp <span class="nv">$ </span>ibmcloud dev build
+<h5 id="building">Building</h5>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span><span class="nb">cd</span> ~/rtgoappv3
+<span class="nv">$ </span>ibmcloud dev build
+
 Getting service credentials <span class="k">for </span>the application.
 OK
 Validating Docker image name
 OK
-Checking <span class="k">if </span>Docker container rtgotestapp-go-tools is running
+Checking <span class="k">if </span>Docker container rtgoappv3-go-tools is running
 OK
 Checking Docker image <span class="nb">history </span>to see <span class="k">if </span>image already exists
 OK
-Creating image rtgotestapp-go-tools based on Dockerfile-tools ...
-Image will have user ryan with <span class="nb">id </span>501 added
+Creating image rtgoappv3-go-tools based on Dockerfile-tools ...
+Image will have user ryan with <span class="nb">id </span>1001 added
 
-Executing docker image build <span class="nt">--file</span> Dockerfile-tools <span class="nt">--tag</span> rtgotestapp-go-tools <span class="nt">--rm</span> <span class="nt">--pull</span> <span class="nt">--build-arg</span> <span class="nv">bx_dev_userid</span><span class="o">=</span>501 <span class="nt">--build-arg</span> <span class="nv">bx_dev_user</span><span class="o">=</span>ryan <span class="nb">.</span>
+Executing docker image build <span class="nt">--file</span> Dockerfile-tools <span class="nt">--tag</span> rtgoappv3-go-tools <span class="nt">--rm</span> <span class="nt">--pull</span> <span class="nt">--build-arg</span> <span class="nv">bx_dev_userid</span><span class="o">=</span>1001 <span class="nt">--build-arg</span> <span class="nv">bx_dev_user</span><span class="o">=</span>ryan <span class="nb">.</span>
 
 OK
-Creating a container named <span class="s1">'rtgotestapp-go-tools'</span> from that image...
+Creating a container named <span class="s1">'rtgoappv3-go-tools'</span> from that image...
 OK
-Starting the <span class="s1">'rtgotestapp-go-tools'</span> container...
+Starting the <span class="s1">'rtgoappv3-go-tools'</span> container...
 OK
 OK
-Stopping the <span class="s1">'rtgotestapp-go-tools'</span> container...
-OK
+Stopping the <span class="s1">'rtgoappv3-go-tools'</span> container...
+OK</code></pre></figure>
 
-~/rtgotestapp <span class="nv">$ </span>ibmcloud dev run
+<h4 id="running-locally">Running Locally</h4>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud dev run 
+
 The run-cmd option was not specified
-Stopping the <span class="s1">'rtgotestapp-go-run'</span> container...
-The <span class="s1">'rtgotestapp-go-run'</span> container was not found
+Stopping the <span class="s1">'rtgoappv3-go-run'</span> container...
+The <span class="s1">'rtgoappv3-go-run'</span> container was not found
 Validating Docker image name
 Binding IP and ports <span class="k">for </span>Docker image.
 OK
-Checking <span class="k">if </span>Docker container rtgotestapp-go-run is running
+Checking <span class="k">if </span>Docker container rtgoappv3-go-run is running
 OK
 Checking Docker image <span class="nb">history </span>to see <span class="k">if </span>image already exists
 OK
-Creating image rtgotestapp-go-run based on Dockerfile ...
+Creating image rtgoappv3-go-run based on Dockerfile ...
 
-Executing docker image build <span class="nt">--file</span> Dockerfile <span class="nt">--tag</span> rtgotestapp-go-run <span class="nt">--rm</span> <span class="nt">--pull</span> <span class="nb">.</span>
+Executing docker image build <span class="nt">--file</span> Dockerfile <span class="nt">--tag</span> rtgoappv3-go-run <span class="nt">--rm</span> <span class="nt">--pull</span> <span class="nb">.</span>
 
 OK
-Creating a container named <span class="s1">'rtgotestapp-go-run'</span> from that image...
-OK
-Starting the <span class="s1">'rtgotestapp-go-run'</span> container...
+Creating a container named <span class="s1">'rtgoappv3-go-run'</span> from that image...
+Waiting <span class="k">for </span>Docker image to build ⠚ OK
+Starting the <span class="s1">'rtgoappv3-go-run'</span> container...
 OK</code></pre></figure>
 
 <p>From another terminal session we can curl our local application and should see the console return logging information:</p>
 
 <figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>curl <span class="nt">-I</span> localhost:8080 
 
-Logs <span class="k">for </span>the rtgotestapp-go-run container:
-<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"msg"</span>:<span class="s2">"Starting rtgotestapp on port :8080"</span>,<span class="s2">"time"</span>:<span class="s2">"2018-10-23T17:25:24Z"</span><span class="o">}</span>
-<span class="o">[</span>GIN] 2018/10/23 - 17:26:25 | 200 |    1.689152ms |      172.17.0.1 |  GET     /
-<span class="o">[</span>GIN] 2018/10/23 - 17:26:31 | 200 |    1.041034ms |      172.17.0.1 |  HEAD     /
-<span class="o">[</span>GIN] 2018/10/23 - 17:26:38 | 200 |     188.675µs |      172.17.0.1 |  HEAD     /
-<span class="o">[</span>GIN] 2018/10/23 - 17:26:44 | 200 |     391.497µs |      172.17.0.1 |  GET     /</code></pre></figure>
+Logs <span class="k">for </span>the rtgoappv3-go-run container:
+<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"msg"</span>:<span class="s2">"Starting rtgoappv3 on port :8080"</span>,<span class="s2">"time"</span>:<span class="s2">"2018-12-12T17:07:40Z"</span><span class="o">}</span>
+<span class="o">[</span>GIN] 2018/12/12 - 17:08:13 | 200 |     1.19781ms |      172.17.0.1 |  HEAD     /
+<span class="o">[</span>GIN] 2018/12/12 - 17:08:20 | 200 |     210.292µs |      172.17.0.1 |  HEAD     /
+<span class="o">[</span>GIN] 2018/12/12 - 17:08:20 | 200 |     204.505µs |      172.17.0.1 |  HEAD     /</code></pre></figure>
+
+<p>If your <code class="highlighter-rouge">dev build</code> or <code class="highlighter-rouge">dev run</code> commands fail, check out some common errors and how to <a href="https://cloud.ibm.com/docs/cli/ts_createapps.html#troubleshoot">troubleshoot them</a>.</p>
 
 <h3 id="cloud-foundry-deployment">Cloud Foundry Deployment</h3>
 <p>With our simple application tested and built we can now move on to deployment. By default when you invoke <code class="highlighter-rouge">ibmcloud dev deploy</code> the application will be deployed using Cloud Foundry.</p>
 
-<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud dev deploy
-
-The <span class="nb">hostname </span><span class="k">for </span>this application will be: rtgotestapp
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud dev deploy 
+The <span class="nb">hostname </span><span class="k">for </span>this application will be: rtgoappv3
 ? Press <span class="o">[</span>Return] to accept this, or enter a new value now&gt;
+
+Provisioning user-defined Cloud Foundry service<span class="o">(</span>s<span class="o">)</span>... ⠂
+Executing ibmcloud cf cups Cloudant-rt <span class="nt">-p</span> <span class="o">{</span>&lt;REDACTED&gt;<span class="o">}</span>
+
 Deploying to Cloud Foundry...
 
 Executing ibmcloud cf push
 
 Invoking <span class="s1">'cf push'</span>...
 
-Pushing from manifest to org CDE TEAM / space coolkids...
-Using manifest file /Users/ryan/rtgotestapp/manifest.yml
-Using manifest file /Users/ryan/rtgotestapp/manifest.yml
+Pushing from manifest to org TheTinylab / space Dev as ryan@example.com...
+Using manifest file /home/ryan/rtgoappv3/manifest.yml
+Using manifest file /home/ryan/rtgoappv3/manifest.yml
 
-Creating app rtgotestapp <span class="k">in </span>org CDE TEAM / space coolkids...
+Creating app rtgoappv3 <span class="k">in </span>org TheTinylab / space Dev as ryan@example.com...
 OK
 
-Creating route rtgotestapp.mybluemix.net...
+Creating route rtgoappv3.mybluemix.net...
 OK
 
-Binding rtgotestapp.mybluemix.net to rtgotestapp...
+Binding rtgoappv3.mybluemix.net to rtgoappv3...
 OK
-
-Uploading rtgotestapp...
-Uploading app files from: /Users/ryan/rtgotestapp
-Uploading 20.6K, 35 files
-Done uploading
-OK
-
-<span class="o">(</span>yada yada yada<span class="o">)</span>
-
-0 of 1 instances running, 1 starting
-1 of 1 instances running
 
 App started
 OK
 
-App rtgotestingapp was started using this <span class="nb">command</span> <span class="sb">`</span>./bin/rtgotestapp<span class="sb">`</span>
+App rtgoappv3 was started using this <span class="nb">command</span> <span class="sb">`</span>./bin/rtgoappv3<span class="sb">`</span>
+
+Showing health and status <span class="k">for </span>app rtgoappv3 <span class="k">in </span>org TheTinylab / space Dev as ryan@cdetest.info...
+OK
+
 requested state: started
 instances: 1/1
 usage: 256M x 1 instances
-urls: rtgotestapp.mybluemix.net
-last uploaded: Tue Nov 27 15:50:50 UTC 2018
+urls: rtgoappv3.mybluemix.net
+last uploaded: Wed Dec 12 17:11:30 UTC 2018
 stack: cflinuxfs2
 buildpack: https://github.com/cloudfoundry/go-buildpack.git#v1.8.25
 
      state     since                    cpu    memory      disk      details
-<span class="c">#0   running   2018-11-27 09:52:49 AM   0.0%   0 of 256M   0 of 1G</span>
+<span class="c">#0   running   2018-12-12 05:13:17 PM   0.0%   0 of 256M   0 of 1G</span>
 
 OK
-Your application is hosted at http://rtgotestapp.mybluemix.net/</code></pre></figure>
+Your application is hosted at http://rtgoappv3.mybluemix.net/</code></pre></figure>
 
 <h3 id="kubernetes-deployment">Kubernetes Deployment</h3>
-
 <p>To deploy your application on Kubernetes, you must either specify the deploy-target as <code class="highlighter-rouge">container</code> in the cli-config.yml or use the parameter <code class="highlighter-rouge">-t container</code> when invoking <code class="highlighter-rouge">ibmcloud dev deploy</code>. If you specify the deploy target in the cli-config.yml file you will also need to add some additional options in order to ensure you are targeting the correct cluster:</p>
 
 <figure class="highlight"><pre><code class="language-shell" data-lang="shell">    deploy-image-target: <span class="s2">"registry.&lt;IBM Cloud Region&gt;.bluemix.net/&lt;Container Registry Namespace&gt;/&lt;App-Name&gt;"</span>
 
     ibm-cluster: <span class="s2">"mycluster"</span></code></pre></figure>
 
+<p>The Kubernetes deployment uses <a href="https://helm.sh/">Helm Charts</a>. The <code class="highlighter-rouge">deploy</code> command will install the server side component <code class="highlighter-rouge">tiller</code> by default, but for better security I would recommend creating a Service Account on your Kubernetes cluster for Helm.</p>
+
+<figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/IBM-Cloud/kube-samples/master/rbac/serviceaccount-tiller.yaml 
+serviceaccount/tiller created
+clusterrolebinding.rbac.authorization.k8s.io/tiller created
+
+<span class="nv">$ </span> helm init <span class="nt">--service-account</span> tiller 
+<span class="nv">$HELM_HOME</span> has been configured at /home/ryan/.helm.
+
+Tiller <span class="o">(</span>the Helm server-side component<span class="o">)</span> has been installed into your Kubernetes Cluster.
+
+Please note: by default, Tiller is deployed with an insecure <span class="s1">'allow unauthenticated users'</span> policy.
+To prevent this, run <span class="sb">`</span>helm init<span class="sb">`</span> with the <span class="nt">--tiller-tls-verify</span> flag.
+For more information on securing your installation see: https://docs.helm.sh/using_helm/#securing-your-helm-installation
+Happy Helming!</code></pre></figure>
+
 <figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud dev deploy <span class="nt">-t</span> container
+
 You are currently logged <span class="k">in</span><span class="nb">.</span> Your application will be deployed to the IBM
 Cloud.
 
 The IBM cluster name <span class="k">for </span>the deployment of this application will be:
-rtk8s
+iks-rt
 
 ? Press <span class="o">[</span>Return] to accept this, or enter a new value now&gt;
 Log <span class="k">in </span>to the IBM Container Registry
 OK
-Configuring with cluster <span class="s1">'rtk8s'</span>
+Configuring with cluster <span class="s1">'iks-rt'</span>
 OK
-? Select a namespace <span class="k">for </span>this deployment
-1. thundercougarfalconbird
-2. rtiffany
-Enter a number&gt; 2
 
-Executing helm get values rtgotestapp
+The container deployment image name <span class="k">for </span>the deployment of this application
+will be: <span class="o">(</span>The image will be tagged by Docker with this base name and appended
+with a version<span class="o">)</span>
 
-Inspecting service bindings <span class="k">for </span>cluster <span class="s1">'rtk8s'</span><span class="nb">.</span>
-OK
-Tag the Run image to the Docker registry as
-registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+registry.ng.bluemix.net/shinyhappynamespace/rtgoappv3
+? Press <span class="o">[</span>Return] to accept this, or enter a new value now&gt;
 
-Executing docker tag rtgotestapp-go-run registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+Executing helm get values rtgoappv3
+Release <span class="s2">"rtgoappv3"</span> does not exist. Installing it now.
 
-Unable to tag the image rtgotestapp-go-run, will now attempt to build and tag
-it
-
-Executing docker build <span class="nt">-f</span> Dockerfile <span class="nt">-t</span> registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1 <span class="nb">.</span>
-
-<span class="o">(</span>yada yada yada<span class="o">)</span>
-
-Release <span class="s2">"rtgotestapp"</span> does not exist. Installing it now.
-NAME:   rtgotestapp
-LAST DEPLOYED: Tue Nov 27 15:33:31 2018
+NAME:   rtgoappv3
+LAST DEPLOYED: Wed Dec 12 18:41:27 2018
 NAMESPACE: default
 STATUS: DEPLOYED
 
-Executing docker rmi registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+RESOURCES:
+<span class="o">==&gt;</span> v1/Pod<span class="o">(</span>related<span class="o">)</span>
+NAME                                  READY  STATUS             RESTARTS  AGE
+rtgoappv3-deployment-c85cd7695-zqkjg  0/1    ContainerCreating  0         0s
+
+<span class="o">==&gt;</span> v1/Service
+
+NAME                           AGE
+rtgoappv3-application-service  0s
+
+<span class="o">==&gt;</span> v1beta1/Deployment
+rtgoappv3-deployment  0s
+OK
+
+Pods:
+NAME                                   READY   STATUS              RESTARTS   AGE
+rtgoappv3-deployment-c85cd7695-zqkjg   0/1     ContainerCreating   0          1s
+
+Deployments:
+NAME                   DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+rtgoappv3-deployment   1         1         1            0           1s
+
+Services:
+NAME                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>          AGE
+kubernetes                      ClusterIP   172.21.0.1       &lt;none&gt;        443/TCP          1h
+rtgoappv3-application-service   NodePort    172.21.209.254   &lt;none&gt;        8080:31617/TCP   1s
+
+Nodes:
+NAME            STATUS   ROLES    AGE   VERSION
+10.209.37.208   Ready    &lt;none&gt;   1h    v1.11.5+IKS
+10.209.37.213   Ready    &lt;none&gt;   1h    v1.11.5+IKS
+
+Untag the Run image from the <span class="nb">local </span>Docker registry
+
+Executing docker rmi registry.ng.bluemix.net/shinyhappynamespace/rtgoappv3:0.0.1
 
 OK
-Your application is hosted at http://169.62.210.230:31774/</code></pre></figure>
+Your application is hosted at http://169.61.30.194:31617/</code></pre></figure>
 
-<h3 id="logging">Logging</h3>
+<p><img src="https://dsc.cloud/quickshare/Screenshot_2018-12-12-12.42.20_yYpaj1.png" alt="Simple go app deployed to Kubernetes" /></p>
 
-<p>If you don’t already have an instance of the <a href="https://console.bluemix.net/docs/services/CloudLogAnalysis/log_analysis_ov.html#log_analysis_ov">IBM Cloud Log Analysis</a> service you can use the CLI to create one.</p>
+<h3 id="logging-with-ibm-cloud-log-analysis">Logging with IBM Cloud Log Analysis</h3>
+<p>If you don’t already have an instance of the <a href="https://cloud.ibm.com/docs/services/CloudLogAnalysis/log_analysis_ov.html#log_analysis_ov">IBM Cloud Log Analysis</a> service you can use the CLI to create one.</p>
 
 <figure class="highlight"><pre><code class="language-shell" data-lang="shell"><span class="nv">$ </span>ibmcloud service create ibmLogAnalysis standard logging-rt
 Invoking <span class="s1">'cf create-service ibmLogAnalysis standard logging-rt'</span>...
 
-Creating service instance logging-rt <span class="k">in </span>org CDE TEAM / space coolkids...
+Creating service instance logging-rt <span class="k">in </span>org TheTinylab / space Dev as ryan@example.com...
 OK</code></pre></figure>
 
 <p>With the logging service instance now deployed we can now view the logs for our Cloud Foundry application using the CLI or the Kibana dashboard.</p>
 
-<figure class="highlight"><pre><code class="language-x" data-lang="x">$ ibmcloud cf logs rtgotestingapp
-Invoking 'cf logs rtgotestingapp'...
+<figure class="highlight"><pre><code class="language-x" data-lang="x">$ ibmcloud cf logs rtgoappv3 
 
-Retrieving logs for app rtgotestingapp 
+Invoking 'cf logs rtgoappv3'...
+Retrieving logs for app rtgoappv3 in org TheTinylab / space Dev as ryan@example.com...
 
-   2018-11-28T20:57:27.04+0000 [RTR/18] OUT rtgotestapp.mybluemix.net - [2018-11-28T20:57:27.025+0000] "GET / HTTP/1.1" 200 0 42 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) Gecko/20100101 Firefox/63.0" "10.142.73.5:26126" "169.47.199.70:61398" x_forwarded_for:"76.224.107.171, 10.142.73.5" x_forwarded_proto:"http" vcap_request_id:"b95a09b2-341a-476a-5b34-f18c5a2e8d85" response_time:0.018924148 app_id:"98c95cd2-12e4-4bf1-b5a8-8ea49160ae0c" app_index:"0" x_global_transaction_id:"216301923" true_client_ip:"-" x_b3_traceid:"253df64a06a76190" x_b3_spanid:"253df64a06a76190" x_b3_parentspanid:"-"
-   2018-11-28T20:57:27.04+0000 [RTR/18] OUT</code></pre></figure>
+   2018-12-12T18:50:10.20+0000 [RTR/22] OUT rtgoappv3.mybluemix.net - [2018-12-12T18:50:10.182+0000] "GET / HTTP/1.1" 200 0 56379 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) Gecko/20100101 Firefox/63.0" "10.184.41.4:57601" "169.46.115.120:61318" x_forwarded_for:"76.224.107.167, 10.184.41.4" x_forwarded_proto:"http" vcap_request_id:"2286ebf5-41b8-4d0a-7884-0a0704f97937" response_time:0.025794918 app_id:"f8ae455b-c6e4-4569-a97d-0d442da37548" app_index:"0" x_global_transaction_id:"3490874319" true_client_ip:"-" x_b3_traceid:"5a8ddd44d94eefec" x_b3_spanid:"5a8ddd44d94eefec" x_b3_parentspanid:"-"
+   2018-12-12T18:50:10.20+0000 [RTR/22] OUT
+   2018-12-12T18:49:53.77+0000 [APP/PROC/WEB/0] OUT [GIN] 2018/12/12 - 18:49:53 | 200 |    6.342807ms |  76.224.107.167 |  GET     /
+   2018-12-12T18:49:53.90+0000 [RTR/26] OUT rtgoappv3.mybluemix.net - [2018-12-12T18:49:53.885+0000] "GET /favicon.ico HTTP/1.1" 200 0 32935 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) Gecko/20100101 Firefox/63.0" "10.184.41.4:59952" "169.46.115.120:61318" x_forwarded_for:"76.224.107.167, 10.184.41.4" x_forwarded_proto:"http" vcap_request_id:"b4816d9f-1e43-42a9-54af-96c1fdc31319" response_time:0.018047205 app_id:"f8ae455b-c6e4-4569-a97d-0d442da37548" app_index:"0" x_global_transaction_id:"2048179073" true_client_ip:"-" x_b3_traceid:"3d0dda24beeb7988" x_b3_spanid:"3d0dda24beeb7988" x_b3_parentspanid:"-"</code></pre></figure>
 
 <p><img src="https://dsc.cloud/quickshare/kibana_dashboard.png" alt="" /></p>
 

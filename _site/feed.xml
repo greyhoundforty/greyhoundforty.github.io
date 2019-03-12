@@ -5,9 +5,224 @@
     <description></description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 28 Nov 2018 15:13:16 -0600</pubDate>
-    <lastBuildDate>Wed, 28 Nov 2018 15:13:16 -0600</lastBuildDate>
+    <pubDate>Tue, 12 Mar 2019 08:51:28 -0500</pubDate>
+    <lastBuildDate>Tue, 12 Mar 2019 08:51:28 -0500</lastBuildDate>
     <generator>Jekyll v3.8.4</generator>
+    
+      <item>
+        <title>Configure Terraform for the IBM Cloud</title>
+        <description>&lt;h2 id=&quot;overview&quot;&gt;Overview&lt;/h2&gt;
+&lt;p&gt;Today I will be showing you how to configure Terraform for use with the IBM Cloud.&lt;/p&gt;
+
+&lt;!--description--&gt;
+
+&lt;h2 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.terraform.io/intro/getting-started/install.html&quot;&gt;Terraform installed&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/IBM-Cloud/terraform-provider-ibm/releases&quot;&gt;IBM Cloud Provider Binary installed&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://cloud.ibm.com/docs/iam/userid_keys.html#userapikey&quot;&gt;IBM Cloud API key&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://cloud.ibm.com/docs/iam/classic_infra_keys.html#classic_keys&quot;&gt;IBM Cloud IaaS/SoftLayer username and API key&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;configure-terraform&quot;&gt;Configure Terraform&lt;/h2&gt;
+&lt;p&gt;Create a &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.terraformrc&lt;/code&gt; file that points to the Terraform binary. For example if you installed the binary to &lt;code class=&quot;highlighter-rouge&quot;&gt;/usr/local/bin/terraform-provider-ibm&lt;/code&gt; the &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.terraformrc&lt;/code&gt; would look like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-hcl highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;providers&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;ibm&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;/usr/local/bin/terraform-provider-ibm&quot;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;configure-plugin-to-work-with-terraform&quot;&gt;Configure Plugin to work with Terraform&lt;/h2&gt;
+
+&lt;p&gt;To provide your credentials as environment variables, you can use the following code in your &lt;code class=&quot;highlighter-rouge&quot;&gt;provider.tf&lt;/code&gt; file.&lt;/p&gt;
+
+&lt;div class=&quot;language-hcl highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;provider&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ibm&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+   &lt;span class=&quot;nx&quot;&gt;bluemix_api_key&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;${var.ibm_bx_api_key}&quot;&lt;/span&gt;
+   &lt;span class=&quot;nx&quot;&gt;softlayer_username&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;${var.ibm_sl_username}&quot;&lt;/span&gt;
+   &lt;span class=&quot;nx&quot;&gt;softlayer_api_key&lt;/span&gt;  &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;${var.ibm_sl_api_key}&quot;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Be sure to also define at minimum the following variables in your &lt;code class=&quot;highlighter-rouge&quot;&gt;variables.tf&lt;/code&gt; file:&lt;/p&gt;
+
+&lt;div class=&quot;language-hcl highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;variable&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ibm_bx_api_key&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;variable&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ibm_sl_username&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+&lt;span class=&quot;nx&quot;&gt;variable&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ibm_sl_api_key&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For any example that also deploys a PaaS offering you may also need to add:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;variable ibm_account_guid {}
+variable ibm_org_guid {}
+variable ibm_space_guid {}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you do not know your IBM Account/Org/Space GUID you can run the following commands to obtain them:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Get account guid &lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud iam accounts
+
+&lt;span class=&quot;c&quot;&gt;# Get Org guid&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud iam orgs &lt;span class=&quot;nt&quot;&gt;--guid&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# Get Space guid&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud iam space &amp;lt;SPACE NAME&amp;gt; &lt;span class=&quot;nt&quot;&gt;--guid&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;With those gathered you can now export your environmental variables for use with Terraform.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;TF_VAR_ibm_bx_api_key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$VALUE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;TF_VAR_ibm_sl_username&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$VALUE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;TF_VAR_ibm_sl_api_key&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$VALUE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;TF_VAR_ibm_account_guid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$VALUE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# If needed&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;TF_VAR_ibm_org_guid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$VALUE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# If needed&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;TF_VAR_ibm_space_guid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$VALUE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;  &lt;span class=&quot;c&quot;&gt;# If needed&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;testing-your-configuration&quot;&gt;Testing your configuration&lt;/h2&gt;
+&lt;p&gt;In order to test if we have everything configured properly we can use the following example code to spin up a &lt;code class=&quot;highlighter-rouge&quot;&gt;transient&lt;/code&gt; instance on the IBM Cloud. The first step is to clone the example code repository:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git clone https://github.com/greyhoundforty/ibm-cloud-terraform-starter.git
+$ cd ibm-cloud-terraform-starter
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now we can configure our &lt;code class=&quot;highlighter-rouge&quot;&gt;credentials.tfvars&lt;/code&gt; file by copying the example version and configuring it with our IBM Cloud information.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cp credentials.tfvars.tmpl credentials.tfvars
+$ nano/vim/editor credentials.tfvars
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;With the credentials configured we can now prepare our system to deploy our VSI:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;terraform init 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;terraform init&lt;/code&gt; command is used to initialize a working directory containing Terraform configuration files. This is the first command that should be run after writing a new Terraform configuration or cloning an existing one from version control. It is safe to run this command multiple times.&lt;/p&gt;
+
+&lt;p&gt;If there were no errors with our configuration we can now run the &lt;code class=&quot;highlighter-rouge&quot;&gt;plan&lt;/code&gt; command. This command will look at our current environment and create an execution plan for what actions need to be taken for the environment to match the desired state listed in the configuration files. The &lt;code class=&quot;highlighter-rouge&quot;&gt;-out&lt;/code&gt; flag is used to save this execution plan to a file that can be used when we &lt;code class=&quot;highlighter-rouge&quot;&gt;apply&lt;/code&gt; our configuration.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;terraform plan -var-file='./credentials.tfvars' -out test.tfplan
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You should see a nice terminal print out of what needs to be done. For a net-new environment it would look something like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Terraform will perform the following actions:
+
+  + ibm_compute_vm_instance.node
+      id:                           &amp;lt;computed&amp;gt;
+      block_storage_ids.#:          &amp;lt;computed&amp;gt;
+      cores:                        &amp;lt;computed&amp;gt;
+      datacenter:                   &quot;dal13&quot;
+      disks.#:                      &amp;lt;computed&amp;gt;
+      domain:                       &quot;example.com&quot;
+      file_storage_ids.#:           &amp;lt;computed&amp;gt;
+      flavor_key_name:              &quot;B1_1X2X100&quot;
+      hostname:                     &quot;${random_id.name.hex}-test&quot;
+      hourly_billing:               &quot;true&quot;
+      ip_address_id:                &amp;lt;computed&amp;gt;
+      ip_address_id_private:        &amp;lt;computed&amp;gt;
+      ipv4_address:                 &amp;lt;computed&amp;gt;
+      ipv4_address_private:         &amp;lt;computed&amp;gt;
+      ipv6_address:                 &amp;lt;computed&amp;gt;
+      ipv6_address_id:              &amp;lt;computed&amp;gt;
+      ipv6_enabled:                 &quot;false&quot;
+      ipv6_static_enabled:          &quot;false&quot;
+      local_disk:                   &quot;false&quot;
+      memory:                       &amp;lt;computed&amp;gt;
+      network_speed:                &quot;1000&quot;
+      os_reference_code:            &quot;UBUNTU_18_64&quot;
+      private_interface_id:         &amp;lt;computed&amp;gt;
+      private_network_only:         &quot;false&quot;
+      private_security_group_ids.#: &amp;lt;computed&amp;gt;
+      private_subnet:               &amp;lt;computed&amp;gt;
+      private_subnet_id:            &amp;lt;computed&amp;gt;
+      private_vlan_id:              &amp;lt;computed&amp;gt;
+      public_bandwidth_limited:     &amp;lt;computed&amp;gt;
+      public_bandwidth_unlimited:   &quot;false&quot;
+      public_interface_id:          &amp;lt;computed&amp;gt;
+      public_ipv6_subnet:           &amp;lt;computed&amp;gt;
+      public_ipv6_subnet_id:        &amp;lt;computed&amp;gt;
+      public_security_group_ids.#:  &amp;lt;computed&amp;gt;
+      public_subnet:                &amp;lt;computed&amp;gt;
+      public_subnet_id:             &amp;lt;computed&amp;gt;
+      public_vlan_id:               &amp;lt;computed&amp;gt;
+      secondary_ip_addresses.#:     &amp;lt;computed&amp;gt;
+      tags.#:                       &quot;1&quot;
+      tags.1224436441:              &quot;terraform-test&quot;
+      transient:                    &quot;true&quot;
+      wait_time_minutes:            &quot;90&quot;
+
+  + random_id.name
+      id:                           &amp;lt;computed&amp;gt;
+      b64:                          &amp;lt;computed&amp;gt;
+      b64_std:                      &amp;lt;computed&amp;gt;
+      b64_url:                      &amp;lt;computed&amp;gt;
+      byte_length:                  &quot;4&quot;
+      dec:                          &amp;lt;computed&amp;gt;
+      hex:                          &amp;lt;computed&amp;gt;
+
+
+Plan: 2 to add, 0 to change, 0 to destroy.
+
+------------------------------------------------------------------------
+
+This plan was saved to: test.tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply &quot;test.tfplan&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To deploy the VSI we run the &lt;code class=&quot;highlighter-rouge&quot;&gt;apply&lt;/code&gt; command on our existing plan file:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ terraform apply test.tfplan
+
+random_id.name: Creating...
+  b64:         &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  b64_std:     &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  b64_url:     &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  byte_length: &quot;&quot; =&amp;gt; &quot;4&quot;
+  dec:         &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  hex:         &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+random_id.name: Creation complete after 0s (ID: oQDmMw)
+ibm_compute_vm_instance.node: Creating...
+  block_storage_ids.#:          &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  cores:                        &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  datacenter:                   &quot;&quot; =&amp;gt; &quot;dal13&quot;
+  disks.#:                      &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  domain:                       &quot;&quot; =&amp;gt; &quot;example.com&quot;
+  file_storage_ids.#:           &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  flavor_key_name:              &quot;&quot; =&amp;gt; &quot;B1_1X2X100&quot;
+  hostname:                     &quot;&quot; =&amp;gt; &quot;a100e633-test&quot;
+  hourly_billing:               &quot;&quot; =&amp;gt; &quot;true&quot;
+  ip_address_id:                &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  ip_address_id_private:        &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  ipv4_address:                 &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  ipv4_address_private:         &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  ipv6_address:                 &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+  ipv6_address_id:              &quot;&quot; =&amp;gt; &quot;&amp;lt;computed&amp;gt;&quot;
+
+&amp;lt;output output output&amp;gt;
+
+ibm_compute_vm_instance.node: Still creating... (3m0s elapsed)
+ibm_compute_vm_instance.node: Still creating... (3m10s elapsed)
+ibm_compute_vm_instance.node: Creation complete after 3m10s (ID: 70547143)
+
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;clean-up&quot;&gt;Clean up&lt;/h2&gt;
+
+&lt;p&gt;To clean up our test deployment we will run the &lt;code class=&quot;highlighter-rouge&quot;&gt;destroy&lt;/code&gt; command to cancel off our transient VSI.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ terraform destroy -var-file='./credentials.tfvars'
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Thu, 31 Jan 2019 15:31:00 -0600</pubDate>
+        <link>http://localhost:4000/2019/01/31/configure-terraform-for-ibm-cloud.html</link>
+        <guid isPermaLink="true">http://localhost:4000/2019/01/31/configure-terraform-for-ibm-cloud.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>IBM Cloud Object storage with s3cmd or rclone</title>
@@ -218,6 +433,7 @@ Transferring:
 &lt;ul&gt;
   &lt;li&gt;An IBM Cloud Account&lt;/li&gt;
   &lt;li&gt;Access to Linux or macOS terminal&lt;/li&gt;
+  &lt;li&gt;Docker installed. You can find the appropriate instructions for your Operating System &lt;a href=&quot;https://docs.docker.com/install/&quot;&gt;here&lt;/a&gt;.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3 id=&quot;installing-cli&quot;&gt;Installing CLI&lt;/h3&gt;
@@ -225,14 +441,14 @@ Transferring:
 &lt;p&gt;You have a few options for how you would like to install the IBM Cloud CLI:&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;Run the one-line installer. This will also install some IBM Cloud Plugins as well as tools to interact with Kubernetes and Docker. See &lt;a href=&quot;https://console.bluemix.net/docs/cli/index.html#overview&quot;&gt;here&lt;/a&gt; for the full list of installed components. Piping to bash is controversial, as it prevents you from reading code that is about to run on your system. Therefore, we provide these alternative installation methods:&lt;/li&gt;
-  &lt;li&gt;Download and install the &lt;a href=&quot;https://console.bluemix.net/docs/cli/reference/ibmcloud/all_versions.html#ibm-cloud-cli-releases&quot;&gt;binary version&lt;/a&gt;. If you’re comfortable unziping files and understand how to move binaries in to your PATH then this is the option for you.&lt;/li&gt;
+  &lt;li&gt;Run the one-line installer. This will also install some IBM Cloud Plugins as well as tools to interact with Kubernetes and Docker. See &lt;a href=&quot;https://cloud.ibm.com/docs/cli/index.html#overview&quot; target=&quot;_blank&quot;&gt;here&lt;/a&gt; for the full list of installed components. Piping to bash is controversial, as it prevents you from reading code that is about to run on your system. Therefore, we provide these alternative installation methods:&lt;/li&gt;
+  &lt;li&gt;Download and install the &lt;a href=&quot;https://cloud.ibm.com/docs/cli/reference/ibmcloud/all_versions.html#ibm-cloud-cli-releases&quot; target=&quot;_blank&quot;&gt;binary version&lt;/a&gt;. If you’re comfortable unziping files and understand how to move binaries in to your PATH then this is the option for you.&lt;/li&gt;
   &lt;li&gt;Use &lt;a href=&quot;https://github.com/l2fprod/bxshell&quot; target=&quot;_blank&quot;&gt;bxshell&lt;/a&gt; which is run as a local Docker container that has the CLI and tools baked in. Pretty handy for kicking the tires.&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;h3 id=&quot;installing-plugins&quot;&gt;Installing plugins&lt;/h3&gt;
 
-&lt;p&gt;If you choose option 1 in the previous step you will also need to install a few plugins to follow along with this tutorial.&lt;/p&gt;
+&lt;p&gt;To install the plugins needed for this tutorial we will use the &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud plugin&lt;/code&gt; subcommand. You can see all the plugins available by running the command &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud plugin repo-plugins -r 'IBM Cloud'&lt;/code&gt;.  If you choose option 1 in the previous step you should have most of the plugins needed to follow along with this tutorial but it won’t hurt to run these commands to ensure they are installed and up to date.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;dev &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud plugin &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;container-service/kubernetes-service &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'IBM Cloud'&lt;/span&gt; 
@@ -242,7 +458,6 @@ Transferring:
 &lt;p&gt;With the CLI and plugins installed we can move on to logging in to the CLI and getting our environment configured.&lt;/p&gt;
 
 &lt;h3 id=&quot;cli-authentication&quot;&gt;CLI Authentication&lt;/h3&gt;
-
 &lt;p&gt;It is not considered best practice to log in to the CLI using your IBMid username and password, so we will invoke the &lt;code class=&quot;highlighter-rouge&quot;&gt;--sso&lt;/code&gt; option which will open a browser window for account log in. Once you have logged in to the account via the browser you will be redirected to a page that has a one-time passcode to use for authentication.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud login &lt;span class=&quot;nt&quot;&gt;--sso&lt;/span&gt;
@@ -261,11 +476,19 @@ Open the URL &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;the default browser
 Authenticating...
 OK
 
-Select an account:
-1. Mouserat Account &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxxxxxxxxxxxx&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-2. IBM &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxxxxxxxxxxxx&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &amp;lt;-&amp;gt; 78003
-Enter a number&amp;gt; 2
-Targeted account IBM &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxxxxxxxxxxxx&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &amp;lt;-&amp;gt; 78003
+Targeted account Ryan Tiffany&lt;span class=&quot;s1&quot;&gt;'s Account (xxxxxxxxxxxxxxx) &amp;lt;-&amp;gt; xxxxxxx
+
+Targeted resource group default
+
+
+API endpoint:      https://api.ng.bluemix.net
+Region:            us-south
+User:              ryan@example.com
+Account:           Ryan Tiffany'&lt;/span&gt;s Account &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxxxx&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &amp;lt;-&amp;gt; xxxxxxx
+Resource group:    default
+CF API endpoint:
+Org:
+Space:
 
 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;output output output&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
@@ -277,217 +500,258 @@ Targeted account IBM &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxx
 
 &lt;p&gt;You will need to copy and paste the key somewhere safe as it will not be displayed again.&lt;/p&gt;
 
-&lt;p&gt;Set environmental variable&lt;/p&gt;
+&lt;h4 id=&quot;set-environmental-variable&quot;&gt;Set environmental variable&lt;/h4&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;IBMCLOUD_API_KEY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'&amp;lt;key copied from previous step&amp;gt;'&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;Setting Resource group, Region, and Space&lt;/p&gt;
+&lt;h4 id=&quot;setting-resource-group-region-and-space&quot;&gt;Setting Resource group, Region, and Space&lt;/h4&gt;
 
-&lt;p&gt;You can target specific pieces of your IBM Cloud environment during the login process using the IBM Cloud CLI. For instance on my account I want to target the CDE TEAM Organization and under that the Resource Group CDE and the Space coolkids in the US-South region:&lt;/p&gt;
+&lt;p&gt;You can target specific pieces of your IBM Cloud environment during the login process using the IBM Cloud CLI. For instance on my account I want to target the &lt;code class=&quot;highlighter-rouge&quot;&gt;Tinylab&lt;/code&gt; Organization and under that the Resource Group &lt;code class=&quot;highlighter-rouge&quot;&gt;default&lt;/code&gt; and the Space &lt;code class=&quot;highlighter-rouge&quot;&gt;dev&lt;/code&gt; in the US-South region:&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud login &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; api.ng.bluemix.net &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;CDE TEAM&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-g&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;CDE&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; coolkids
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud target &lt;span class=&quot;nt&quot;&gt;--cf&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; TheTinylab &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; dev
 
-Targeted account IBM &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;xxxxxxxxxxxxxxxxxxxxxxx&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &amp;lt;-&amp;gt; 78003
-Targeted resource group CDE
 Targeted Cloud Foundry &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;https://api.ng.bluemix.net&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-Targeted org CDE TEAM
-Targeted space coolkids
+Targeted org TheTinylab
+Targeted space Dev
 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;output output output&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;h2 id=&quot;creating-a-starter-application-using-the-ibm-cloud-cli-dev-plugin&quot;&gt;Creating a starter application using the IBM Cloud CLI Dev plugin&lt;/h2&gt;
+&lt;p&gt;Now that we’re logged in and ready to get up and running we’ll invoke the &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud dev create&lt;/code&gt; command to walk us through the process of creating our Web app. In this guide we won’t be setting up a DevOps toolchain deployment so select &lt;code class=&quot;highlighter-rouge&quot;&gt;3&lt;/code&gt; when prompted about deployment options.&lt;/p&gt;
 
-&lt;p&gt;Now that we’re logged in and ready to get up and running we’ll invoke the &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud dev create&lt;/code&gt; command to walk us through the process of creating our Web app:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://asciinema.org/a/216612&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;https://asciinema.org/a/216612.svg&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://asciinema.org/a/208069&quot; target=&quot;_blank&quot;&gt;&lt;img src=&quot;https://asciinema.org/a/208069.svg&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;updating-our-starter-application&quot;&gt;Updating our starter application&lt;/h3&gt;
-
+&lt;h3 id=&quot;building-and-testing-our-starter-application&quot;&gt;Building and testing our starter application&lt;/h3&gt;
 &lt;p&gt;As you can see in the video above, the &lt;code class=&quot;highlighter-rouge&quot;&gt;dev&lt;/code&gt; tool created our application code, bound an IBM Cloud service (in this case Cloudant), and downloaded the code to our local directory. If you created an application via the GUI you can invoke the command &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud dev code &amp;lt;name of app&amp;gt;&lt;/code&gt; to download the code in to your current directory.&lt;/p&gt;
 
 &lt;p&gt;With the code now on our machine we can build our application and test it locally using the build and run subcommands:&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/rtgotestapp
-~/rtgotestapp &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev build
+&lt;h5 id=&quot;building&quot;&gt;Building&lt;/h5&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ~/rtgoappv3
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev build
+
 Getting service credentials &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the application.
 OK
 Validating Docker image name
 OK
-Checking &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;Docker container rtgotestapp-go-tools is running
+Checking &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;Docker container rtgoappv3-go-tools is running
 OK
 Checking Docker image &lt;span class=&quot;nb&quot;&gt;history &lt;/span&gt;to see &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;image already exists
 OK
-Creating image rtgotestapp-go-tools based on Dockerfile-tools ...
-Image will have user ryan with &lt;span class=&quot;nb&quot;&gt;id &lt;/span&gt;501 added
+Creating image rtgoappv3-go-tools based on Dockerfile-tools ...
+Image will have user ryan with &lt;span class=&quot;nb&quot;&gt;id &lt;/span&gt;1001 added
 
-Executing docker image build &lt;span class=&quot;nt&quot;&gt;--file&lt;/span&gt; Dockerfile-tools &lt;span class=&quot;nt&quot;&gt;--tag&lt;/span&gt; rtgotestapp-go-tools &lt;span class=&quot;nt&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pull&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--build-arg&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;bx_dev_userid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;501 &lt;span class=&quot;nt&quot;&gt;--build-arg&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;bx_dev_user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ryan &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Executing docker image build &lt;span class=&quot;nt&quot;&gt;--file&lt;/span&gt; Dockerfile-tools &lt;span class=&quot;nt&quot;&gt;--tag&lt;/span&gt; rtgoappv3-go-tools &lt;span class=&quot;nt&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pull&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--build-arg&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;bx_dev_userid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1001 &lt;span class=&quot;nt&quot;&gt;--build-arg&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;bx_dev_user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ryan &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
 
 OK
-Creating a container named &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-tools'&lt;/span&gt; from that image...
+Creating a container named &lt;span class=&quot;s1&quot;&gt;'rtgoappv3-go-tools'&lt;/span&gt; from that image...
 OK
-Starting the &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-tools'&lt;/span&gt; container...
+Starting the &lt;span class=&quot;s1&quot;&gt;'rtgoappv3-go-tools'&lt;/span&gt; container...
 OK
 OK
-Stopping the &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-tools'&lt;/span&gt; container...
-OK
+Stopping the &lt;span class=&quot;s1&quot;&gt;'rtgoappv3-go-tools'&lt;/span&gt; container...
+OK&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-~/rtgotestapp &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev run
+&lt;h4 id=&quot;running-locally&quot;&gt;Running Locally&lt;/h4&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev run 
+
 The run-cmd option was not specified
-Stopping the &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-run'&lt;/span&gt; container...
-The &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-run'&lt;/span&gt; container was not found
+Stopping the &lt;span class=&quot;s1&quot;&gt;'rtgoappv3-go-run'&lt;/span&gt; container...
+The &lt;span class=&quot;s1&quot;&gt;'rtgoappv3-go-run'&lt;/span&gt; container was not found
 Validating Docker image name
 Binding IP and ports &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;Docker image.
 OK
-Checking &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;Docker container rtgotestapp-go-run is running
+Checking &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;Docker container rtgoappv3-go-run is running
 OK
 Checking Docker image &lt;span class=&quot;nb&quot;&gt;history &lt;/span&gt;to see &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;image already exists
 OK
-Creating image rtgotestapp-go-run based on Dockerfile ...
+Creating image rtgoappv3-go-run based on Dockerfile ...
 
-Executing docker image build &lt;span class=&quot;nt&quot;&gt;--file&lt;/span&gt; Dockerfile &lt;span class=&quot;nt&quot;&gt;--tag&lt;/span&gt; rtgotestapp-go-run &lt;span class=&quot;nt&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pull&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Executing docker image build &lt;span class=&quot;nt&quot;&gt;--file&lt;/span&gt; Dockerfile &lt;span class=&quot;nt&quot;&gt;--tag&lt;/span&gt; rtgoappv3-go-run &lt;span class=&quot;nt&quot;&gt;--rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pull&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
 
 OK
-Creating a container named &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-run'&lt;/span&gt; from that image...
-OK
-Starting the &lt;span class=&quot;s1&quot;&gt;'rtgotestapp-go-run'&lt;/span&gt; container...
+Creating a container named &lt;span class=&quot;s1&quot;&gt;'rtgoappv3-go-run'&lt;/span&gt; from that image...
+Waiting &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;Docker image to build ⠚ OK
+Starting the &lt;span class=&quot;s1&quot;&gt;'rtgoappv3-go-run'&lt;/span&gt; container...
 OK&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;From another terminal session we can curl our local application and should see the console return logging information:&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-I&lt;/span&gt; localhost:8080 
 
-Logs &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the rtgotestapp-go-run container:
-&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;level&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;info&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;msg&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Starting rtgotestapp on port :8080&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;time&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;2018-10-23T17:25:24Z&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:25 | 200 |    1.689152ms |      172.17.0.1 |  GET     /
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:31 | 200 |    1.041034ms |      172.17.0.1 |  HEAD     /
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:38 | 200 |     188.675µs |      172.17.0.1 |  HEAD     /
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/10/23 - 17:26:44 | 200 |     391.497µs |      172.17.0.1 |  GET     /&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+Logs &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the rtgoappv3-go-run container:
+&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;level&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;info&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;msg&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;Starting rtgoappv3 on port :8080&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;time&quot;&lt;/span&gt;:&lt;span class=&quot;s2&quot;&gt;&quot;2018-12-12T17:07:40Z&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/12/12 - 17:08:13 | 200 |     1.19781ms |      172.17.0.1 |  HEAD     /
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/12/12 - 17:08:20 | 200 |     210.292µs |      172.17.0.1 |  HEAD     /
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GIN] 2018/12/12 - 17:08:20 | 200 |     204.505µs |      172.17.0.1 |  HEAD     /&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If your &lt;code class=&quot;highlighter-rouge&quot;&gt;dev build&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;dev run&lt;/code&gt; commands fail, check out some common errors and how to &lt;a href=&quot;https://cloud.ibm.com/docs/cli/ts_createapps.html#troubleshoot&quot;&gt;troubleshoot them&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h3 id=&quot;cloud-foundry-deployment&quot;&gt;Cloud Foundry Deployment&lt;/h3&gt;
 &lt;p&gt;With our simple application tested and built we can now move on to deployment. By default when you invoke &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud dev deploy&lt;/code&gt; the application will be deployed using Cloud Foundry.&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev deploy
-
-The &lt;span class=&quot;nb&quot;&gt;hostname &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;this application will be: rtgotestapp
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev deploy 
+The &lt;span class=&quot;nb&quot;&gt;hostname &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;this application will be: rtgoappv3
 ? Press &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Return] to accept this, or enter a new value now&amp;gt;
+
+Provisioning user-defined Cloud Foundry service&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;... ⠂
+Executing ibmcloud cf cups Cloudant-rt &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&amp;lt;REDACTED&amp;gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
 Deploying to Cloud Foundry...
 
 Executing ibmcloud cf push
 
 Invoking &lt;span class=&quot;s1&quot;&gt;'cf push'&lt;/span&gt;...
 
-Pushing from manifest to org CDE TEAM / space coolkids...
-Using manifest file /Users/ryan/rtgotestapp/manifest.yml
-Using manifest file /Users/ryan/rtgotestapp/manifest.yml
+Pushing from manifest to org TheTinylab / space Dev as ryan@example.com...
+Using manifest file /home/ryan/rtgoappv3/manifest.yml
+Using manifest file /home/ryan/rtgoappv3/manifest.yml
 
-Creating app rtgotestapp &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;org CDE TEAM / space coolkids...
+Creating app rtgoappv3 &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;org TheTinylab / space Dev as ryan@example.com...
 OK
 
-Creating route rtgotestapp.mybluemix.net...
+Creating route rtgoappv3.mybluemix.net...
 OK
 
-Binding rtgotestapp.mybluemix.net to rtgotestapp...
+Binding rtgoappv3.mybluemix.net to rtgoappv3...
 OK
-
-Uploading rtgotestapp...
-Uploading app files from: /Users/ryan/rtgotestapp
-Uploading 20.6K, 35 files
-Done uploading
-OK
-
-&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;yada yada yada&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-0 of 1 instances running, 1 starting
-1 of 1 instances running
 
 App started
 OK
 
-App rtgotestingapp was started using this &lt;span class=&quot;nb&quot;&gt;command&lt;/span&gt; &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;./bin/rtgotestapp&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
+App rtgoappv3 was started using this &lt;span class=&quot;nb&quot;&gt;command&lt;/span&gt; &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;./bin/rtgoappv3&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
+
+Showing health and status &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;app rtgoappv3 &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;org TheTinylab / space Dev as ryan@cdetest.info...
+OK
+
 requested state: started
 instances: 1/1
 usage: 256M x 1 instances
-urls: rtgotestapp.mybluemix.net
-last uploaded: Tue Nov 27 15:50:50 UTC 2018
+urls: rtgoappv3.mybluemix.net
+last uploaded: Wed Dec 12 17:11:30 UTC 2018
 stack: cflinuxfs2
 buildpack: https://github.com/cloudfoundry/go-buildpack.git#v1.8.25
 
      state     since                    cpu    memory      disk      details
-&lt;span class=&quot;c&quot;&gt;#0   running   2018-11-27 09:52:49 AM   0.0%   0 of 256M   0 of 1G&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#0   running   2018-12-12 05:13:17 PM   0.0%   0 of 256M   0 of 1G&lt;/span&gt;
 
 OK
-Your application is hosted at http://rtgotestapp.mybluemix.net/&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+Your application is hosted at http://rtgoappv3.mybluemix.net/&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;h3 id=&quot;kubernetes-deployment&quot;&gt;Kubernetes Deployment&lt;/h3&gt;
-
 &lt;p&gt;To deploy your application on Kubernetes, you must either specify the deploy-target as &lt;code class=&quot;highlighter-rouge&quot;&gt;container&lt;/code&gt; in the cli-config.yml or use the parameter &lt;code class=&quot;highlighter-rouge&quot;&gt;-t container&lt;/code&gt; when invoking &lt;code class=&quot;highlighter-rouge&quot;&gt;ibmcloud dev deploy&lt;/code&gt;. If you specify the deploy target in the cli-config.yml file you will also need to add some additional options in order to ensure you are targeting the correct cluster:&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;    deploy-image-target: &lt;span class=&quot;s2&quot;&gt;&quot;registry.&amp;lt;IBM Cloud Region&amp;gt;.bluemix.net/&amp;lt;Container Registry Namespace&amp;gt;/&amp;lt;App-Name&amp;gt;&quot;&lt;/span&gt;
 
     ibm-cluster: &lt;span class=&quot;s2&quot;&gt;&quot;mycluster&quot;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
+&lt;p&gt;The Kubernetes deployment uses &lt;a href=&quot;https://helm.sh/&quot;&gt;Helm Charts&lt;/a&gt;. The &lt;code class=&quot;highlighter-rouge&quot;&gt;deploy&lt;/code&gt; command will install the server side component &lt;code class=&quot;highlighter-rouge&quot;&gt;tiller&lt;/code&gt; by default, but for better security I would recommend creating a Service Account on your Kubernetes cluster for Helm.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/IBM-Cloud/kube-samples/master/rbac/serviceaccount-tiller.yaml 
+serviceaccount/tiller created
+clusterrolebinding.rbac.authorization.k8s.io/tiller created
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt; helm init &lt;span class=&quot;nt&quot;&gt;--service-account&lt;/span&gt; tiller 
+&lt;span class=&quot;nv&quot;&gt;$HELM_HOME&lt;/span&gt; has been configured at /home/ryan/.helm.
+
+Tiller &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;the Helm server-side component&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; has been installed into your Kubernetes Cluster.
+
+Please note: by default, Tiller is deployed with an insecure &lt;span class=&quot;s1&quot;&gt;'allow unauthenticated users'&lt;/span&gt; policy.
+To prevent this, run &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;helm init&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt; with the &lt;span class=&quot;nt&quot;&gt;--tiller-tls-verify&lt;/span&gt; flag.
+For more information on securing your installation see: https://docs.helm.sh/using_helm/#securing-your-helm-installation
+Happy Helming!&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud dev deploy &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; container
+
 You are currently logged &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; Your application will be deployed to the IBM
 Cloud.
 
 The IBM cluster name &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the deployment of this application will be:
-rtk8s
+iks-rt
 
 ? Press &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Return] to accept this, or enter a new value now&amp;gt;
 Log &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;to the IBM Container Registry
 OK
-Configuring with cluster &lt;span class=&quot;s1&quot;&gt;'rtk8s'&lt;/span&gt;
+Configuring with cluster &lt;span class=&quot;s1&quot;&gt;'iks-rt'&lt;/span&gt;
 OK
-? Select a namespace &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;this deployment
-1. thundercougarfalconbird
-2. rtiffany
-Enter a number&amp;gt; 2
 
-Executing helm get values rtgotestapp
+The container deployment image name &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;the deployment of this application
+will be: &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;The image will be tagged by Docker with this base name and appended
+with a version&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
 
-Inspecting service bindings &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;cluster &lt;span class=&quot;s1&quot;&gt;'rtk8s'&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
-OK
-Tag the Run image to the Docker registry as
-registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+registry.ng.bluemix.net/shinyhappynamespace/rtgoappv3
+? Press &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;Return] to accept this, or enter a new value now&amp;gt;
 
-Executing docker tag rtgotestapp-go-run registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+Executing helm get values rtgoappv3
+Release &lt;span class=&quot;s2&quot;&gt;&quot;rtgoappv3&quot;&lt;/span&gt; does not exist. Installing it now.
 
-Unable to tag the image rtgotestapp-go-run, will now attempt to build and tag
-it
-
-Executing docker build &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; Dockerfile &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1 &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
-
-&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;yada yada yada&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-
-Release &lt;span class=&quot;s2&quot;&gt;&quot;rtgotestapp&quot;&lt;/span&gt; does not exist. Installing it now.
-NAME:   rtgotestapp
-LAST DEPLOYED: Tue Nov 27 15:33:31 2018
+NAME:   rtgoappv3
+LAST DEPLOYED: Wed Dec 12 18:41:27 2018
 NAMESPACE: default
 STATUS: DEPLOYED
 
-Executing docker rmi registry.ng.bluemix.net/rtiffany/rtgotestapp:0.0.1
+RESOURCES:
+&lt;span class=&quot;o&quot;&gt;==&amp;gt;&lt;/span&gt; v1/Pod&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;related&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+NAME                                  READY  STATUS             RESTARTS  AGE
+rtgoappv3-deployment-c85cd7695-zqkjg  0/1    ContainerCreating  0         0s
+
+&lt;span class=&quot;o&quot;&gt;==&amp;gt;&lt;/span&gt; v1/Service
+
+NAME                           AGE
+rtgoappv3-application-service  0s
+
+&lt;span class=&quot;o&quot;&gt;==&amp;gt;&lt;/span&gt; v1beta1/Deployment
+rtgoappv3-deployment  0s
+OK
+
+Pods:
+NAME                                   READY   STATUS              RESTARTS   AGE
+rtgoappv3-deployment-c85cd7695-zqkjg   0/1     ContainerCreating   0          1s
+
+Deployments:
+NAME                   DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+rtgoappv3-deployment   1         1         1            0           1s
+
+Services:
+NAME                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;S&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;          AGE
+kubernetes                      ClusterIP   172.21.0.1       &amp;lt;none&amp;gt;        443/TCP          1h
+rtgoappv3-application-service   NodePort    172.21.209.254   &amp;lt;none&amp;gt;        8080:31617/TCP   1s
+
+Nodes:
+NAME            STATUS   ROLES    AGE   VERSION
+10.209.37.208   Ready    &amp;lt;none&amp;gt;   1h    v1.11.5+IKS
+10.209.37.213   Ready    &amp;lt;none&amp;gt;   1h    v1.11.5+IKS
+
+Untag the Run image from the &lt;span class=&quot;nb&quot;&gt;local &lt;/span&gt;Docker registry
+
+Executing docker rmi registry.ng.bluemix.net/shinyhappynamespace/rtgoappv3:0.0.1
 
 OK
-Your application is hosted at http://169.62.210.230:31774/&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+Your application is hosted at http://169.61.30.194:31617/&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;h3 id=&quot;logging&quot;&gt;Logging&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;https://dsc.cloud/quickshare/Screenshot_2018-12-12-12.42.20_yYpaj1.png&quot; alt=&quot;Simple go app deployed to Kubernetes&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;If you don’t already have an instance of the &lt;a href=&quot;https://console.bluemix.net/docs/services/CloudLogAnalysis/log_analysis_ov.html#log_analysis_ov&quot;&gt;IBM Cloud Log Analysis&lt;/a&gt; service you can use the CLI to create one.&lt;/p&gt;
+&lt;h3 id=&quot;logging-with-ibm-cloud-log-analysis&quot;&gt;Logging with IBM Cloud Log Analysis&lt;/h3&gt;
+&lt;p&gt;If you don’t already have an instance of the &lt;a href=&quot;https://cloud.ibm.com/docs/services/CloudLogAnalysis/log_analysis_ov.html#log_analysis_ov&quot;&gt;IBM Cloud Log Analysis&lt;/a&gt; service you can use the CLI to create one.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ibmcloud service create ibmLogAnalysis standard logging-rt
 Invoking &lt;span class=&quot;s1&quot;&gt;'cf create-service ibmLogAnalysis standard logging-rt'&lt;/span&gt;...
 
-Creating service instance logging-rt &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;org CDE TEAM / space coolkids...
+Creating service instance logging-rt &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;org TheTinylab / space Dev as ryan@example.com...
 OK&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;With the logging service instance now deployed we can now view the logs for our Cloud Foundry application using the CLI or the Kibana dashboard.&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-x&quot; data-lang=&quot;x&quot;&gt;$ ibmcloud cf logs rtgotestingapp
-Invoking 'cf logs rtgotestingapp'...
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-x&quot; data-lang=&quot;x&quot;&gt;$ ibmcloud cf logs rtgoappv3 
 
-Retrieving logs for app rtgotestingapp 
+Invoking 'cf logs rtgoappv3'...
+Retrieving logs for app rtgoappv3 in org TheTinylab / space Dev as ryan@example.com...
 
-   2018-11-28T20:57:27.04+0000 [RTR/18] OUT rtgotestapp.mybluemix.net - [2018-11-28T20:57:27.025+0000] &quot;GET / HTTP/1.1&quot; 200 0 42 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) Gecko/20100101 Firefox/63.0&quot; &quot;10.142.73.5:26126&quot; &quot;169.47.199.70:61398&quot; x_forwarded_for:&quot;76.224.107.171, 10.142.73.5&quot; x_forwarded_proto:&quot;http&quot; vcap_request_id:&quot;b95a09b2-341a-476a-5b34-f18c5a2e8d85&quot; response_time:0.018924148 app_id:&quot;98c95cd2-12e4-4bf1-b5a8-8ea49160ae0c&quot; app_index:&quot;0&quot; x_global_transaction_id:&quot;216301923&quot; true_client_ip:&quot;-&quot; x_b3_traceid:&quot;253df64a06a76190&quot; x_b3_spanid:&quot;253df64a06a76190&quot; x_b3_parentspanid:&quot;-&quot;
-   2018-11-28T20:57:27.04+0000 [RTR/18] OUT&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+   2018-12-12T18:50:10.20+0000 [RTR/22] OUT rtgoappv3.mybluemix.net - [2018-12-12T18:50:10.182+0000] &quot;GET / HTTP/1.1&quot; 200 0 56379 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) Gecko/20100101 Firefox/63.0&quot; &quot;10.184.41.4:57601&quot; &quot;169.46.115.120:61318&quot; x_forwarded_for:&quot;76.224.107.167, 10.184.41.4&quot; x_forwarded_proto:&quot;http&quot; vcap_request_id:&quot;2286ebf5-41b8-4d0a-7884-0a0704f97937&quot; response_time:0.025794918 app_id:&quot;f8ae455b-c6e4-4569-a97d-0d442da37548&quot; app_index:&quot;0&quot; x_global_transaction_id:&quot;3490874319&quot; true_client_ip:&quot;-&quot; x_b3_traceid:&quot;5a8ddd44d94eefec&quot; x_b3_spanid:&quot;5a8ddd44d94eefec&quot; x_b3_parentspanid:&quot;-&quot;
+   2018-12-12T18:50:10.20+0000 [RTR/22] OUT
+   2018-12-12T18:49:53.77+0000 [APP/PROC/WEB/0] OUT [GIN] 2018/12/12 - 18:49:53 | 200 |    6.342807ms |  76.224.107.167 |  GET     /
+   2018-12-12T18:49:53.90+0000 [RTR/26] OUT rtgoappv3.mybluemix.net - [2018-12-12T18:49:53.885+0000] &quot;GET /favicon.ico HTTP/1.1&quot; 200 0 32935 &quot;-&quot; &quot;Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:63.0) Gecko/20100101 Firefox/63.0&quot; &quot;10.184.41.4:59952&quot; &quot;169.46.115.120:61318&quot; x_forwarded_for:&quot;76.224.107.167, 10.184.41.4&quot; x_forwarded_proto:&quot;http&quot; vcap_request_id:&quot;b4816d9f-1e43-42a9-54af-96c1fdc31319&quot; response_time:0.018047205 app_id:&quot;f8ae455b-c6e4-4569-a97d-0d442da37548&quot; app_index:&quot;0&quot; x_global_transaction_id:&quot;2048179073&quot; true_client_ip:&quot;-&quot; x_b3_traceid:&quot;3d0dda24beeb7988&quot; x_b3_spanid:&quot;3d0dda24beeb7988&quot; x_b3_parentspanid:&quot;-&quot;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://dsc.cloud/quickshare/kibana_dashboard.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 

@@ -88,7 +88,7 @@ Now we can configure our `credentials.tfvars` file by copying the example versio
 
 ```
 $ cp credentials.tfvars.tmpl credentials.tfvars
-$ nano/vim/editor credentials.tfvars
+$ [nano/vi(m)] credentials.tfvars
 ```
 
 With the credentials configured we can now prepare our system to deploy our VSI:
